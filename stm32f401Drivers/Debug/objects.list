@@ -1,0 +1,3 @@
+"./Src/APP/TEST/rcc_test.o"
+"./Src/MCAL/RCC/RCC.o"
+"./Startup/startup_stm32f401ccux.o"

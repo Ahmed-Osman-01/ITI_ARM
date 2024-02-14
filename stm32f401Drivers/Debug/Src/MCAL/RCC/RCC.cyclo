@@ -1,0 +1,10 @@
+../Src/MCAL/RCC/RCC.c:275:19:RCC_EnableClk	13
+../Src/MCAL/RCC/RCC.c:327:19:RCC_DisableClk	8
+../Src/MCAL/RCC/RCC.c:374:19:RCC_SetSystemClk	7
+../Src/MCAL/RCC/RCC.c:404:19:RCC_SetPllSource	5
+../Src/MCAL/RCC/RCC.c:441:19:RCC_SetPllClk	9
+../Src/MCAL/RCC/RCC.c:473:19:RCC_EnablePeripheral	5
+../Src/MCAL/RCC/RCC.c:501:19:RCC_DisablePeripheral	5
+../Src/MCAL/RCC/RCC.c:531:19:RCC_SetAHBPrescale	3
+../Src/MCAL/RCC/RCC.c:552:19:RCC_SetAPB1Prescale	3
+../Src/MCAL/RCC/RCC.c:573:19:RCC_SetAPB2Prescale	3

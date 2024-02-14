@@ -1,0 +1,13 @@
+#include "../Inc/LIB/STD_TYPES.h"
+#include "../Inc/RCC/RCC.h"
+
+int _start()
+{
+    RCC_EnableClk(RCC_CLK_HSE);
+
+    while(1)
+    {
+
+    }
+    return 0;
+}
