@@ -32,10 +32,12 @@
 #define GPIO_PORT_C  0x00000002
 
 /*******Macros for the GPIO pin modes*******/
-#define GPIO_MODE_IN_FL 0x00000000
-#define GPIO_MODE_IN_PU 0x00000008
-#define GPIO_MODE_IN_PD 0x00000018
+#define GPIO_MODE_IN       0x00000000
+#define GPIO_MODE_IN_FL    0x00000000
+#define GPIO_MODE_IN_PU    0x00000008
+#define GPIO_MODE_IN_PD    0x00000018
 
+#define GPIO_MODE_OP       0x00000001
 #define GPIO_MODE_OP_PP    0x00000001
 #define GPIO_MODE_OP_PP_PU 0x00000009
 #define GPIO_MODE_OP_PP_PD 0x00000011
@@ -43,6 +45,7 @@
 #define GPIO_MODE_OP_OD_PU 0x0000000D
 #define GPIO_MODE_OP_OD_PD 0x00000015
 
+#define GPIO_MODE_AF       0x00000002
 #define GPIO_MODE_AF_PP    0x00000002
 #define GPIO_MODE_AF_PP_PU 0x0000000A
 #define GPIO_MODE_AF_PP_PD 0x00000012
@@ -59,9 +62,11 @@
 #define GPIO_SPEED_VHIGH   0x00000003
 
 /*******Macros for Pin states*******/
-#define GPIO_HIGH          0x00000001
-#define GPIO_LOW           0x00000000
+#define GPIO_STATE_HIGH          0x00000001
+#define GPIO_STATE_LOW           0x00000000
 
+
+/* Pin configuration Struct */
 typedef struct
 {
     u32 Port;
@@ -94,7 +99,7 @@ GPIO_ErrorStatus_t GPIO_Init(GPIO_Pin_t* ADD_Config);
  * @param Copy_State State to set the Pin to (High, Low)
  * @return GPIO_ErrorStatus_t Error status 
  */
-GPIO_ErrorStatus_t GPIO_SetPin(u8 Copy_Port, u8 Copy_Pin, u8 Copy_State);
+GPIO_ErrorStatus_t GPIO_SetPinState(u8 Copy_Port, u8 Copy_Pin, u8 Copy_State);
 
 
 /**

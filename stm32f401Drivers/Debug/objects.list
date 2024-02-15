@@ -1,3 +1,5 @@
+"./Src/APP/TEST/gpio_test.o"
 "./Src/APP/TEST/rcc_test.o"
+"./Src/MCAL/GPIO/GPIO.o"
 "./Src/MCAL/RCC/RCC.o"
 "./Startup/startup_stm32f401ccux.o"

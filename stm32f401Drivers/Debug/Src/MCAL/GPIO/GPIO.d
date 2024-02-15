@@ -1,0 +1,4 @@
+Src/MCAL/GPIO/GPIO.o: ../Src/MCAL/GPIO/GPIO.c ../Inc/LIB/STD_TYPES.h \
+ ../Inc/MCAL/GPIO/GPIO.h
+../Inc/LIB/STD_TYPES.h:
+../Inc/MCAL/GPIO/GPIO.h:

@@ -11,6 +11,7 @@ RM := rm -rf
 -include sources.mk
 -include Startup/subdir.mk
 -include Src/MCAL/RCC/subdir.mk
+-include Src/MCAL/GPIO/subdir.mk
 -include Src/APP/TEST/subdir.mk
 -include objects.mk
 
@@ -60,8 +61,8 @@ all: main-build
 main-build: stm32f401Drivers.elf secondary-outputs
 
 # Tool invocations
-stm32f401Drivers.elf stm32f401Drivers.map: $(OBJS) $(USER_OBJS) D:\ITI\Eng_Tourkey\stmCubeWorkSpace\stm32f401Drivers\STM32F401CCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "stm32f401Drivers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\ITI\Eng_Tourkey\stmCubeWorkSpace\stm32f401Drivers\STM32F401CCUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f401Drivers.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+stm32f401Drivers.elf stm32f401Drivers.map: $(OBJS) $(USER_OBJS) D:\ITI\Eng_Tourkey\stmCubeWorkSpace\ITI_ARM\stm32f401Drivers\STM32F401CCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "stm32f401Drivers.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\ITI\Eng_Tourkey\stmCubeWorkSpace\ITI_ARM\stm32f401Drivers\STM32F401CCUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f401Drivers.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
