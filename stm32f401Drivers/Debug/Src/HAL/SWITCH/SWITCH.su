@@ -1,0 +1,2 @@
+../Src/HAL/SWITCH/SWITCH.c:18:22:SWITCH_Init	32	static
+../Src/HAL/SWITCH/SWITCH.c:39:4:SWITCH_GetSwitchState	24	static

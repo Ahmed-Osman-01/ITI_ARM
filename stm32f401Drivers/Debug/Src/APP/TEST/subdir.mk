@@ -6,14 +6,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Src/APP/TEST/gpio_test.c \
+../Src/APP/TEST/led_switch_test.c \
 ../Src/APP/TEST/rcc_test.c 
 
 OBJS += \
 ./Src/APP/TEST/gpio_test.o \
+./Src/APP/TEST/led_switch_test.o \
 ./Src/APP/TEST/rcc_test.o 
 
 C_DEPS += \
 ./Src/APP/TEST/gpio_test.d \
+./Src/APP/TEST/led_switch_test.d \
 ./Src/APP/TEST/rcc_test.d 
 
 
@@ -24,7 +27,7 @@ Src/APP/TEST/%.o Src/APP/TEST/%.su Src/APP/TEST/%.cyclo: ../Src/APP/TEST/%.c Src
 clean: clean-Src-2f-APP-2f-TEST
 
 clean-Src-2f-APP-2f-TEST:
-	-$(RM) ./Src/APP/TEST/gpio_test.cyclo ./Src/APP/TEST/gpio_test.d ./Src/APP/TEST/gpio_test.o ./Src/APP/TEST/gpio_test.su ./Src/APP/TEST/rcc_test.cyclo ./Src/APP/TEST/rcc_test.d ./Src/APP/TEST/rcc_test.o ./Src/APP/TEST/rcc_test.su
+	-$(RM) ./Src/APP/TEST/gpio_test.cyclo ./Src/APP/TEST/gpio_test.d ./Src/APP/TEST/gpio_test.o ./Src/APP/TEST/gpio_test.su ./Src/APP/TEST/led_switch_test.cyclo ./Src/APP/TEST/led_switch_test.d ./Src/APP/TEST/led_switch_test.o ./Src/APP/TEST/led_switch_test.su ./Src/APP/TEST/rcc_test.cyclo ./Src/APP/TEST/rcc_test.d ./Src/APP/TEST/rcc_test.o ./Src/APP/TEST/rcc_test.su
 
 .PHONY: clean-Src-2f-APP-2f-TEST
 

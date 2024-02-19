@@ -1,10 +1,10 @@
-15:08:04 **** Incremental Build of configuration Debug for project stm32f401Drivers ****
+17:55:17 **** Incremental Build of configuration Debug for project stm32f401Drivers ****
 make -j8 all 
 arm-none-eabi-size  stm32f401Drivers.elf 
    text	   data	    bss	    dec	    hex	filename
-   1756	      8	   1568	   3332	    d04	stm32f401Drivers.elf
+   2320	      8	   1568	   3896	    f38	stm32f401Drivers.elf
 Finished building: default.size.stdout
  
 
-15:08:05 Build Finished. 0 errors, 0 warnings. (took 500ms)
+17:55:18 Build Finished. 0 errors, 0 warnings. (took 283ms)
 

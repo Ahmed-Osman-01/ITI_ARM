@@ -1,0 +1,123 @@
+/*
+ * GPIO.c
+ *
+ *  Created on: Feb 13, 2024
+ *      Author: Osman
+ */
+
+#include "LIB/STD_TYPES.h"
+#include "MCAL/GPIO/GPIO.h"
+
+
+#define GPIO_MODE_MASK              0x00000003
+#define GPIO_OTYPE_MASK             0x00000004
+#define GPIO_PUPD_MASK              0x00000018
+#define GPIO_2_BIT_MASK             0x00000003
+#define GPIO_4_BIT_MASK             0x0000000F
+#define GPIO_PIN_OFFSET_2           0x00000002      /* In the case of registers where each pin is represented by 2 bits */
+#define GPIO_PIN_OFFSET_4           0x00000004      /* In the case of registers where each pin is represented by 4 bits */
+#define GPIO_BSRR_RESET_OFFSET      0x00000010      /* To access the Reset part of the BSRR Register */
+#define GPIO_OTYPE_POS_IN_MODE		0x00000002		/* Position of OTYPE bit in the MODE Macro */
+#define GPIO_PUPD_POS_IN_MODE		0x00000003		/* Position of PUPD bit in the MODE Macro */
+
+
+#define GPIOA_BASE_ADDRESS          0x40020000
+#define GPIOB_BASE_ADDRESS          0x40020400
+#define GPIOC_BASE_ADDRESS          0x40020800
+
+typedef struct
+{
+    u32 MODER;
+    u32 OTYPER;
+    u32 OSPEEDR;
+    u32 PUPDR;
+    u32 IDR;
+    u32 ODR;
+    u32 BSRR;
+    u32 LCKR;
+    u64 AFR;
+
+}GPIO_Registers_t;
+
+
+
+
+/* static volatile GPIO_Registers_t * const GPIOs[3] = {(volatile GPIO_Registers_t *)GPIOA_BASE_ADDRESS,
+												    (volatile GPIO_Registers_t *)GPIOB_BASE_ADDRESS,
+													(volatile GPIO_Registers_t *)GPIOC_BASE_ADDRESS}; */
+
+
+
+
+GPIO_ErrorStatus_t GPIO_Init(GPIO_Pin_t* ADD_Config)
+{
+    GPIO_ErrorStatus_t Ret_ErrorStatus = GPIO_OK;
+    u32 Local_TmpReg;
+    u64 Local_AFTmpReg; /* AFH and AFL are treated as one 64bit Register */
+
+    /* Set the Pin Mode (Input, Output, AF, Analog)*/
+    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->MODER;
+    Local_TmpReg &= ~( GPIO_2_BIT_MASK << (ADD_Config->Pin * GPIO_PIN_OFFSET_2)) ;
+    Local_TmpReg |= ( (ADD_Config->Mode & GPIO_MODE_MASK) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
+    ((GPIO_Registers_t *)(ADD_Config->Port))->MODER = Local_TmpReg;
+
+    /* Set the Pin output type (Push Pull or Open Drain)*/
+    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->OTYPER;
+    Local_TmpReg &= ~ ( 1 << (ADD_Config->Pin) );
+    Local_TmpReg |= ( ((ADD_Config->Mode & GPIO_OTYPE_MASK) >> GPIO_OTYPE_POS_IN_MODE) << (ADD_Config->Pin) );
+    ((GPIO_Registers_t *)(ADD_Config->Port))->OTYPER = Local_TmpReg;
+
+    /* Set pin pullup/pulldown/floating */
+    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->PUPDR;
+    Local_TmpReg &= ~( (GPIO_2_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_2) );
+    Local_TmpReg |= ( ((ADD_Config->Mode & GPIO_PUPD_MASK) >> GPIO_PUPD_POS_IN_MODE) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
+    ((GPIO_Registers_t *)(ADD_Config->Port))->PUPDR = Local_TmpReg;
+
+    /* Set Pin speed */
+    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->OSPEEDR;
+    Local_TmpReg &= ~( (GPIO_2_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_2) );
+    Local_TmpReg |= ( (ADD_Config->Speed) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
+    ((GPIO_Registers_t *)(ADD_Config->Port))->OSPEEDR = Local_TmpReg;
+
+
+    /* Set AF */
+    Local_AFTmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->AFR;
+    Local_AFTmpReg &= ~( ((u64)GPIO_4_BIT_MASK) << (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
+    Local_AFTmpReg |= ( ((u64)ADD_Config->AF) << (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
+    ((GPIO_Registers_t *)(ADD_Config->Port))->AFR = Local_AFTmpReg;
+
+    return Ret_ErrorStatus;
+}
+
+GPIO_ErrorStatus_t GPIO_SetPinState(void * Copy_Port, u8 Copy_Pin, u8 Copy_State)
+{
+    GPIO_ErrorStatus_t Ret_ErrorStatus = GPIO_OK;
+    
+    switch(Copy_State)
+    {
+        case GPIO_STATE_LOW:
+            ((GPIO_Registers_t *)Copy_Port)->BSRR = ( 1<< (Copy_Pin+GPIO_BSRR_RESET_OFFSET) );
+            break;
+
+        case GPIO_STATE_HIGH:
+            ((GPIO_Registers_t *)Copy_Port)->BSRR = (1<< Copy_Pin);
+            break;
+
+        default:
+            Ret_ErrorStatus = GPIO_NOK;
+    }
+    
+
+    return Ret_ErrorStatus;
+}
+
+
+u8 GPIO_GetPin(void * Copy_Port, u8 Copy_Pin)
+{
+    u8 Ret_PinState;
+
+    Ret_PinState = ( ((GPIO_Registers_t *)Copy_Port)->IDR & ( 1 << Copy_Pin) ) >> Copy_Pin;
+
+    return Ret_PinState;
+}
+

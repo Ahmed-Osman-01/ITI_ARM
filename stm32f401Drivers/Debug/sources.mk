@@ -23,6 +23,8 @@ C_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 Src/APP/TEST \
+Src/HAL/LED \
+Src/HAL/SWITCH \
 Src/MCAL/GPIO \
 Src/MCAL/RCC \
 Startup \

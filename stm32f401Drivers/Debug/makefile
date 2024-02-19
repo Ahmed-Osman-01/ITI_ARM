@@ -12,6 +12,8 @@ RM := rm -rf
 -include Startup/subdir.mk
 -include Src/MCAL/RCC/subdir.mk
 -include Src/MCAL/GPIO/subdir.mk
+-include Src/HAL/SWITCH/subdir.mk
+-include Src/HAL/LED/subdir.mk
 -include Src/APP/TEST/subdir.mk
 -include objects.mk
 

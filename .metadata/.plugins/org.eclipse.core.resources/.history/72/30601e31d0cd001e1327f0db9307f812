@@ -1,0 +1,42 @@
+/*
+ * LED.c
+ *
+ *  Created on: Feb 17, 2024
+ *      Author: Osman
+ */
+
+
+#include "LIB/STD_TYPES.h"
+#include "HAL/LED/LED.h"
+#include "MCAL/GPIO/GPIO.h "
+
+extern LED_Config_t Leds[_LED_NUM];
+
+LED_ErrorStatus_t LED_Init(void)
+{
+    LED_ErrorStatus_t Ret_ErrorStatus = LED_OK;
+    GPIO_Pin_t Local_Led;
+    u8 Local_iter;
+    Local_Led.Mode = GPIO_MODE_OP_PP;
+    Local_Led.Speed = GPIO_SPEED_HIGH;
+
+    for(Local_iter = 0; Local_iter < _LED_NUM; Local_iter++)
+    {
+        Local_Led.Port = Leds[Local_iter].Port;
+        Local_Led.Pin = Leds[Local_iter].Pin;
+
+        GPIO_Init(&Local_Led);
+    }
+
+    return Ret_ErrorStatus;
+}
+
+
+LED_ErrorStatus_t LED_SetState(u8 Copy_Led, u8 Copy_State)
+{
+    LED_ErrorStatus_t Ret_ErrorStatus = LED_OK;
+
+    Ret_ErrorStatus = GPIO_SetPinState(Leds[Copy_Led].Port, Leds[Copy_Led].Pin, Copy_State ^ Leds[Copy_Led].Connection);
+
+    return Ret_ErrorStatus;
+}

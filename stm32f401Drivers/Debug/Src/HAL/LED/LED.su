@@ -1,0 +1,2 @@
+../Src/HAL/LED/LED.c:15:19:LED_Init	32	static
+../Src/HAL/LED/LED.c:35:19:LED_SetState	32	static

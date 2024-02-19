@@ -27,15 +27,15 @@
 #define GPIO_PIN_15 0x0000000F
 
 /*******Macros for the GPIO ports*******/
-#define GPIO_PORT_A  0x00000000
-#define GPIO_PORT_B  0x00000001
-#define GPIO_PORT_C  0x00000002
+#define GPIO_PORT_A  (void *)0x40020000
+#define GPIO_PORT_B  (void *)0x40020400
+#define GPIO_PORT_C  (void *)0x40020800
 
 /*******Macros for the GPIO pin modes*******/
 #define GPIO_MODE_IN       0x00000000
 #define GPIO_MODE_IN_FL    0x00000000
 #define GPIO_MODE_IN_PU    0x00000008
-#define GPIO_MODE_IN_PD    0x00000018
+#define GPIO_MODE_IN_PD    0x00000010
 
 #define GPIO_MODE_OP       0x00000001
 #define GPIO_MODE_OP_PP    0x00000001
@@ -66,13 +66,32 @@
 #define GPIO_STATE_LOW           0x00000000
 
 
+/*******Macros for The Alternate Functions*******/
+#define GPIO_AF_SYSTEM          0x00000000
+#define GPIO_AF_TIM1_2          0x00000001
+#define GPIO_AF_TIM3_5          0x00000002
+#define GPIO_AF_TIME9_11        0x00000003
+#define GPIO_AF_I2C1_3          0x00000004
+#define GPIO_AF_SPI1_4          0x00000005
+#define GPIO_AF_SPI3            0x00000006
+#define GPIO_AF_USART1_2        0x00000007
+#define GPIO_AF_USART6          0x00000008
+#define GPIO_AF_I2C2_3          0x00000009
+#define GPIO_AF_OTG_FS          0x0000000A
+#define GPIO_AF_SDIO            0x0000000C
+#define GPIO_AF_EVENTOUT        0x0000000F
+
+
+
+
 /* Pin configuration Struct */
 typedef struct
 {
-    u32 Port;
+    void* Port;
     u32 Pin;
     u32 Mode;
     u32 Speed;
+    u32 AF;
 }GPIO_Pin_t;
 
 typedef enum
@@ -99,7 +118,7 @@ GPIO_ErrorStatus_t GPIO_Init(GPIO_Pin_t* ADD_Config);
  * @param Copy_State State to set the Pin to (High, Low)
  * @return GPIO_ErrorStatus_t Error status 
  */
-GPIO_ErrorStatus_t GPIO_SetPinState(u8 Copy_Port, u8 Copy_Pin, u8 Copy_State);
+GPIO_ErrorStatus_t GPIO_SetPinState(void * Copy_Port, u32 Copy_Pin, u8 Copy_State);
 
 
 /**
@@ -109,7 +128,7 @@ GPIO_ErrorStatus_t GPIO_SetPinState(u8 Copy_Port, u8 Copy_Pin, u8 Copy_State);
  * @param Copy_Pin Pin number in the port
  * @return u8 State of the Pin (High, Low)
  */
-u8 GPIO_GetPin(u8 Copy_Port, u8 Copy_Pin);
+u8 GPIO_GetPin(void * Copy_Port, u32 Copy_Pin);
 
 
 #endif /* MCAL_GPIO_GPIO_H_ */
