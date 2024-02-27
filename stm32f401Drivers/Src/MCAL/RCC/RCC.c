@@ -18,6 +18,8 @@
 #define RCC_APB1_PRESCALE_MASK   0x00001C00
 #define RCC_APB2_PRESCALE_MASK   0x0000E000
 
+#define RCC_TIMEOUT_PERIOD  (600UL)
+
 #define RCC_BASE_ADDRESS        0x40023800
 #define RCC     ((volatile RCC_Registers_t * const)RCC_BASE_ADDRESS)
 
@@ -275,43 +277,43 @@ typedef enum
 RCC_ErrorStatus_t RCC_EnableClk(u8 Copy_Clk)
 {
     RCC_ErrorStatus_t Ret_ErrorStatus = RCC_OK;
-
+    u16 Local_Timeout = RCC_TIMEOUT_PERIOD;
     switch(Copy_Clk)
     {
         case RCC_CLK_HSI:
             RCC->CR |= (1<<RCC_HSION);
             /* Wait till Ready */
-            while( ((RCC->CR >> RCC_HSIRDY) & 1) == 0 );
+            while( (((RCC->CR >> RCC_HSIRDY) & 1) == 0) && (!Local_Timeout) ){Local_Timeout--;}
             break;
 
         case RCC_CLK_HSE:
             RCC->CR |= (1<<RCC_HSEON);
             /* Wait till Ready */
-            while( ((RCC->CR >> RCC_HSERDY) & 1) == 0 );
+            while( (((RCC->CR >> RCC_HSERDY) & 1) == 0) && (!Local_Timeout) ){Local_Timeout--;}
             break;
 
         case RCC_CLK_PLL:
             RCC->CR |= (1<<RCC_PLLON);
             /* Wait till Ready */
-            while( ((RCC->CR >> RCC_PLLRDY) & 1) == 0 );
+            while( (((RCC->CR >> RCC_PLLRDY) & 1) == 0) && (!Local_Timeout) ){Local_Timeout--;}
             break;
 
         case RCC_CLK_PLL2:
             RCC->CR |= (1<<RCC_PLLI2SON);
             /* Wait till Ready */
-            while( ((RCC->CR >> RCC_PLLI2SRDY) & 1) == 0 );
+            while( (((RCC->CR >> RCC_PLLI2SRDY) & 1) == 0) && (!Local_Timeout) ){Local_Timeout--;}
             break;
 
         case RCC_CLK_LSE:
-            RCC->CR |= (1<<RCC_LSEON);
+            RCC->BDCR |= (1<<RCC_LSEON);
             /* Wait till Ready */
-            while( ((RCC->BDCR >> RCC_LSERDY) & 1) == 0 );
+            while( (((RCC->BDCR >> RCC_LSERDY) & 1) == 0) && (!Local_Timeout) ){Local_Timeout--;}
             break;
 
         case RCC_CLK_LSI:
-            RCC->CR |= (1<<RCC_LSION);
+            RCC->CSR |= (1<<RCC_LSION);
             /* Wait till Ready */
-            while( ((RCC->CSR >> RCC_LSIRDY) & 1) == 0 );
+            while( (((RCC->CSR >> RCC_LSIRDY) & 1) == 0) && (!Local_Timeout) ){Local_Timeout--;}
             break;
 
         default:
