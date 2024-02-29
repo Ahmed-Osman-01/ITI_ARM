@@ -51,47 +51,92 @@ typedef enum
 }RCC_ErrorStatus_t;
 
 
-typedef enum
-{
-    /* AHB1 Peripherals */
-    RCC_GPIOA  = 0,
-    RCC_GPIOB  = 1,
-    RCC_GPIOC  = 2,
-    RCC_CRC    = 12,
-    RCC_DMA1   = 21,
-    RCC_DMA2   = 22,
+// typedef enum
+// {
+//     /* AHB1 Peripherals */
+//     RCC_GPIOA  = 0,
+//     RCC_GPIOB  = 1,
+//     RCC_GPIOC  = 2,
+//     RCC_CRC    = 12,
+//     RCC_DMA1   = 21,
+//     RCC_DMA2   = 22,
 
-    /* AHB2 Peripherals*/
-    RCC_OTGFS   = 39,
+//     /* AHB2 Peripherals*/
+//     RCC_OTGFS   = 39,
 
-    /* APB1 Peripherals */
-    RCC_TIM2   = 64,
-    RCC_TIM3   = 65,
-    RCC_TIM4   = 66,
-    RCC_TIM5   = 67,
-    RCC_WWDG   = 75,
-    RCC_SPI2   = 78,
-    RCC_SPI3   = 79,
-    RCC_USART2 = 81,
-    RCC_I2C1   = 85,
-    RCC_I2C2   = 85,
-    RCC_I2C3   = 87,
-    RCC_PWR    = 92,
+//     /* APB1 Peripherals */
+//     RCC_TIM2   = 64,
+//     RCC_TIM3   = 65,
+//     RCC_TIM4   = 66,
+//     RCC_TIM5   = 67,
+//     RCC_WWDG   = 75,
+//     RCC_SPI2   = 78,
+//     RCC_SPI3   = 79,
+//     RCC_USART2 = 81,
+//     RCC_I2C1   = 85,
+//     RCC_I2C2   = 85,
+//     RCC_I2C3   = 87,
+//     RCC_PWR    = 92,
 
-    /* APB2 Peripherals */
-    RCC_TIM1   = 96,
-    RCC_USART1 = 100,
-    RCC_USART6 = 101,
-    RCC_SDIO   = 107,
-    RCC_SPI1   = 108,
-    RCC_SPI4   = 109,
-    RCC_SYSCFG = 110,
-    RCC_TIM9   = 112,
-    RCC_TIM10   = 113,
-    RCC_TIM11   = 114,
+//     /* APB2 Peripherals */
+//     RCC_TIM1   = 96,
+//     RCC_USART1 = 100,
+//     RCC_USART6 = 101,
+//     RCC_SDIO   = 107,
+//     RCC_SPI1   = 108,
+//     RCC_SPI4   = 109,
+//     RCC_SYSCFG = 110,
+//     RCC_TIM9   = 112,
+//     RCC_TIM10   = 113,
+//     RCC_TIM11   = 114,
 
+// }RCC_Peripheral_t;
+
+
+/* AHB1 Peripherals */
+typedef enum {
+    RCC_GPIOA  = (u64)0 + 0x300000000ULL,
+    RCC_GPIOB  = (u64)1 + 0x300000000ULL,
+    RCC_GPIOC  = (u64)2 + 0x300000000ULL,
+    RCC_CRC    = (u64)12 + 0x300000000ULL,
+    RCC_DMA1   = (u64)21 + 0x300000000ULL,
+    RCC_DMA2   = (u64)22 + 0x300000000ULL,
+
+
+/* AHB2 Peripherals*/
+
+    RCC_OTGFS   = (u64)39 + 0x300000000ULL,
+
+
+/* APB1 Peripherals */
+
+    RCC_TIM2   = (u64)64 + 0x300000000ULL,
+    RCC_TIM3   = (u64)65 + 0x300000000ULL,
+    RCC_TIM4   = (u64)66 + 0x300000000ULL,
+    RCC_TIM5   = (u64)67 + 0x300000000ULL,
+    RCC_WWDG   = (u64)75 + 0x300000000ULL,
+    RCC_SPI2   = (u64)78 + 0x300000000ULL,
+    RCC_SPI3   = (u64)79 + 0x300000000ULL,
+    RCC_USART2 = (u64)81 + 0x300000000ULL,
+    RCC_I2C1   = (u64)85 + 0x300000000ULL,
+    RCC_I2C2   = (u64)85 + 0x300000000ULL,
+    RCC_I2C3   = (u64)87 + 0x300000000ULL,
+    RCC_PWR    = (u64)92 + 0x300000000ULL,
+
+
+/* APB2 Peripherals */
+
+    RCC_TIM1   = (u64)96 + 0x300000000ULL,
+    RCC_USART1 = (u64)100 + 0x300000000ULL,
+    RCC_USART6 = (u64)101 + 0x300000000ULL,
+    RCC_SDIO   = (u64)107 + 0x300000000ULL,
+    RCC_SPI1   = (u64)108 + 0x300000000ULL,
+    RCC_SPI4   = (u64)109 + 0x300000000ULL,
+    RCC_SYSCFG = (u64)110 + 0x300000000ULL,
+    RCC_TIM9   = (u64)112 + 0x300000000ULL,
+    RCC_TIM10  = (u64)113 + 0x300000000ULL,
+    RCC_TIM11  = (u64)114 + 0x300000000ULL,
 }RCC_Peripheral_t;
-
 
 
 /**
