@@ -47,7 +47,8 @@ SWITCH_ErrorStatus_t SWITCH_Init(void)
 
    GPIO_Pin_t Local_Switch;
    u8 Local_Iter;
-
+   Local_Switch.Speed = GPIO_SPEED_HIGH;
+   Local_Switch.AF = GPIO_AF_SYSTEM;
 
    for(Local_Iter = 0; Local_Iter < _SWITCH_NUM; Local_Iter++)
    {
@@ -94,7 +95,7 @@ SWITCH_ErrorStatus_t SWITCH_GetSwitchState(SWITCH_ID_t Copy_SwitchID, u8 *Add_Sw
 
     if(Ret_ErrorStatus == SWITCH_OK)
     {
-        GPIO_GetPin(Switches[Copy_SwitchID].Port, Switches[Copy_SwitchID].Pin, &Local_PinState);
+       Ret_ErrorStatus = GPIO_GetPin(Switches[Copy_SwitchID].Port, Switches[Copy_SwitchID].Pin, &Local_PinState);
 
         /* This line to return Either Pressed Or Released Regardless of the Connection
             If The connection is PullUp then inverse the returned state from GPIO to match the

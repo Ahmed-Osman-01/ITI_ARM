@@ -16,6 +16,6 @@ typedef enum
 
 /* DON'T REMOVE _LED_NUM OR ADD ANYTHING AFTER IT */
     _LED_NUM,
-}LED_Names_t;
+}LED_ID_t;
 
 #endif /* HAL_LED_CONFIG_H_ */

@@ -18,7 +18,7 @@ const LED_Config_t Leds[_LED_NUM] = {
     },
     [LED_TWO] = {
         .Port = GPIO_PORT_A,
-        .Pin = GPIO_PIN_0,
+        .Pin = GPIO_PIN_1,
         .Connection = LED_CONNECTION_FORWARD,
         .InitState = LED_STATE_OFF,
     },
