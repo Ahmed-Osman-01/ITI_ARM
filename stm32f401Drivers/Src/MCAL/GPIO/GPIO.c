@@ -8,6 +8,9 @@
 #include "LIB/STD_TYPES.h"
 #include "MCAL/GPIO/GPIO.h"
 
+/* ============================================================================ */
+/*                                  MASKS MACROS                           */
+/* ============================================================================ */
 
 #define GPIO_MODE_MASK              0x00000003
 #define GPIO_OTYPE_MASK             0x00000004
@@ -21,10 +24,60 @@
 #define GPIO_PUPD_POS_IN_MODE		0x00000003		/* Position of PUPD bit in the MODE Macro */
 
 
-#define GPIOA_BASE_ADDRESS          0x40020000
-#define GPIOB_BASE_ADDRESS          0x40020400
-#define GPIOC_BASE_ADDRESS          0x40020800
 
+/* ============================================================================ */
+/*                                  VALIDATION MACROS                           */
+/* ============================================================================ */
+
+#define IS_GPIO_MODE(MODE)      (((MODE) == GPIO_MODE_IN)       || \
+                                ((MODE) == GPIO_MODE_IN_FL)    || \
+                                ((MODE) == GPIO_MODE_IN_PU)    || \
+                                ((MODE) == GPIO_MODE_IN_PD)    || \
+                                ((MODE) == GPIO_MODE_OP)       || \
+                                ((MODE) == GPIO_MODE_OP_PP)    || \
+                                ((MODE) == GPIO_MODE_OP_PP_PU) || \
+                                ((MODE) == GPIO_MODE_OP_PP_PD) || \
+                                ((MODE) == GPIO_MODE_OP_OD)    || \
+                                ((MODE) == GPIO_MODE_OP_OD_PU) || \
+                                ((MODE) == GPIO_MODE_OP_OD_PD) || \
+                                ((MODE) == GPIO_MODE_AF)       || \
+                                ((MODE) == GPIO_MODE_AF_PP)    || \
+                                ((MODE) == GPIO_MODE_AF_PP_PU) || \
+                                ((MODE) == GPIO_MODE_AF_PP_PD) || \
+                                ((MODE) == GPIO_MODE_AF_OD)    || \
+                                ((MODE) == GPIO_MODE_AF_OD_PU) || \
+                                ((MODE) == GPIO_MODE_AF_OD_PD) || \
+                                ((MODE) == GPIO_MODE_ANALOG)) 
+
+
+#define IS_GPIO_PORT(PORT)     (((PORT) == GPIO_PORT_A) || \
+                                ((PORT) == GPIO_PORT_B) || \
+                                ((PORT) == GPIO_PORT_C))
+
+#define IS_GPIO_PIN(PORT)      (((PORT) >= GPIO_PIN_0) && ((PORT) <= GPIO_PIN_15))
+
+#define IS_GPIO_STATE(STATE)   (((STATE) == GPIO_STATE_HIGH) || ((STATE) == GPIO_STATE_LOW))
+
+#define IS_GPIO_SPEED(SPEED)   (((SPEED) >= GPIO_SPEED_LOW) && ((SPEED) <= GPIO_SPEED_VHIGH ))
+
+#define IS_VALID_AF(AF)        (((AF) == GPIO_AF_SYSTEM)   || \
+                                ((AF) == GPIO_AF_TIM1_2)   || \
+                                ((AF) == GPIO_AF_TIM3_5)   || \
+                                ((AF) == GPIO_AF_TIME9_11) || \
+                                ((AF) == GPIO_AF_I2C1_3)   || \
+                                ((AF) == GPIO_AF_SPI1_4)   || \
+                                ((AF) == GPIO_AF_SPI3)     || \
+                                ((AF) == GPIO_AF_USART1_2) || \
+                                ((AF) == GPIO_AF_USART6)   || \
+                                ((AF) == GPIO_AF_I2C2_3)   || \
+                                ((AF) == GPIO_AF_OTG_FS)   || \
+                                ((AF) == GPIO_AF_SDIO)     || \
+                                ((AF) == GPIO_AF_EVENTOUT))
+
+
+/* ============================================================================ */
+/*                                    TYPES                                     */
+/* ============================================================================ */
 typedef struct
 {
     u32 MODER;
@@ -44,12 +97,9 @@ typedef struct
 
 
 
-/* static volatile GPIO_Registers_t * const GPIOs[3] = {(volatile GPIO_Registers_t *)GPIOA_BASE_ADDRESS,
-												    (volatile GPIO_Registers_t *)GPIOB_BASE_ADDRESS,
-													(volatile GPIO_Registers_t *)GPIOC_BASE_ADDRESS}; */
-
-
-
+/* ========================================================================================= */
+/*                                      IMPLEMENTATION                                       */
+/* ========================================================================================= */
 
 GPIO_ErrorStatus_t GPIO_Init(GPIO_Pin_t* ADD_Config)
 {
@@ -57,73 +107,121 @@ GPIO_ErrorStatus_t GPIO_Init(GPIO_Pin_t* ADD_Config)
     u32 Local_TmpReg;
     u64 Local_AFTmpReg; /* AFH and AFL are treated as one 64bit Register */
 
-    /* Set the Pin Mode (Input, Output, AF, Analog)*/
-    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->MODER;
-    Local_TmpReg &= ~( GPIO_2_BIT_MASK << (ADD_Config->Pin * GPIO_PIN_OFFSET_2)) ;
-    Local_TmpReg |= ( (ADD_Config->Mode & GPIO_MODE_MASK) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
-    ((GPIO_Registers_t *)(ADD_Config->Port))->MODER = Local_TmpReg;
+    if(ADD_Config == NULL)
+    {
+        Ret_ErrorStatus = GPIO_NULLPTR;
+    }
+    else if(!IS_GPIO_PORT(ADD_Config->Port))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_PORT;
+    }
+    else if(!IS_GPIO_PIN(ADD_Config->Pin))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_PIN;
+    }
+    else if(!IS_GPIO_MODE(ADD_Config->Mode))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_MODE;
+    }
+    else if(!IS_GPIO_SPEED(ADD_Config->Speed))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_SPEED;
+    }
+    else
+    {
+        /* do nothing */
+    }
 
-    /* Set the Pin output type (Push Pull or Open Drain)*/
-    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->OTYPER;
-    Local_TmpReg &= ~ ( 1 << (ADD_Config->Pin) );
-    Local_TmpReg |= ( ((ADD_Config->Mode & GPIO_OTYPE_MASK) >> GPIO_OTYPE_POS_IN_MODE) << (ADD_Config->Pin) );
-    ((GPIO_Registers_t *)(ADD_Config->Port))->OTYPER = Local_TmpReg;
+    if(Ret_ErrorStatus == GPIO_OK)
+    {
+        /* Set the Pin Mode (Input, Output, AF, Analog)*/
+        Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->MODER;
+        Local_TmpReg &= ~( GPIO_2_BIT_MASK << (ADD_Config->Pin * GPIO_PIN_OFFSET_2)) ;
+        Local_TmpReg |= ( (ADD_Config->Mode & GPIO_MODE_MASK) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
+        ((GPIO_Registers_t *)(ADD_Config->Port))->MODER = Local_TmpReg;
 
-    /* Set pin pullup/pulldown/floating */
-    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->PUPDR;
-    Local_TmpReg &= ~( (GPIO_2_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_2) );
-    Local_TmpReg |= ( ((ADD_Config->Mode & GPIO_PUPD_MASK) >> GPIO_PUPD_POS_IN_MODE) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
-    ((GPIO_Registers_t *)(ADD_Config->Port))->PUPDR = Local_TmpReg;
+        /* Set the Pin output type (Push Pull or Open Drain)*/
+        Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->OTYPER;
+        Local_TmpReg &= ~ ( 1 << (ADD_Config->Pin) );
+        Local_TmpReg |= ( ((ADD_Config->Mode & GPIO_OTYPE_MASK) >> GPIO_OTYPE_POS_IN_MODE) << (ADD_Config->Pin) );
+        ((GPIO_Registers_t *)(ADD_Config->Port))->OTYPER = Local_TmpReg;
 
-    /* Set Pin speed */
-    Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->OSPEEDR;
-    Local_TmpReg &= ~( (GPIO_2_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_2) );
-    Local_TmpReg |= ( (ADD_Config->Speed) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
-    ((GPIO_Registers_t *)(ADD_Config->Port))->OSPEEDR = Local_TmpReg;
+        /* Set pin pullup/pulldown/floating */
+        Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->PUPDR;
+        Local_TmpReg &= ~( (GPIO_2_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_2) );
+        Local_TmpReg |= ( ((ADD_Config->Mode & GPIO_PUPD_MASK) >> GPIO_PUPD_POS_IN_MODE) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
+        ((GPIO_Registers_t *)(ADD_Config->Port))->PUPDR = Local_TmpReg;
 
-
-    /* Set AF */
-
-//    if(ADD_Config->Pin < 8)
-//    {
-//    	Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->AFRL;
-//		Local_TmpReg &= ~( (GPIO_4_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
-//		Local_TmpReg |= ( (ADD_Config->AF) << (ADD_Config->Pin * GPIO_PIN_OFFSET_4) );
-//		((GPIO_Registers_t *)(ADD_Config->Port))->AFRL = Local_TmpReg;
-//    }
-//    else
-//    {
-//    	Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->AFRH;
-//		Local_TmpReg &= ~( (GPIO_4_BIT_MASK)<< ((ADD_Config->Pin - 8) * GPIO_PIN_OFFSET_4) );
-//		Local_TmpReg |= ( (ADD_Config->AF) << ((ADD_Config->Pin - 8) * GPIO_PIN_OFFSET_4) );
-//		((GPIO_Registers_t *)(ADD_Config->Port))->AFRH = Local_TmpReg;
-//    }
-    Local_AFTmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->AFR;
-    Local_AFTmpReg &= ~( ((u64)GPIO_4_BIT_MASK) << (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
-    Local_AFTmpReg |= ( ((u64)ADD_Config->AF) << (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
-    ((GPIO_Registers_t *)(ADD_Config->Port))->AFR = Local_AFTmpReg;
+        /* Set Pin speed */
+        Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->OSPEEDR;
+        Local_TmpReg &= ~( (GPIO_2_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_2) );
+        Local_TmpReg |= ( (ADD_Config->Speed) << (ADD_Config->Pin * GPIO_PIN_OFFSET_2) );
+        ((GPIO_Registers_t *)(ADD_Config->Port))->OSPEEDR = Local_TmpReg;
 
 
+        /* Set AF */
+        Local_AFTmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->AFR;
+        Local_AFTmpReg &= ~( ((u64)GPIO_4_BIT_MASK) << (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
+        Local_AFTmpReg |= ( ((u64)ADD_Config->AF) << (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
+        ((GPIO_Registers_t *)(ADD_Config->Port))->AFR = Local_AFTmpReg;
+
+    //    if(ADD_Config->Pin < 8)
+    //    {
+    //    	Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->AFRL;
+    //		Local_TmpReg &= ~( (GPIO_4_BIT_MASK)<< (ADD_Config->Pin*GPIO_PIN_OFFSET_4) );
+    //		Local_TmpReg |= ( (ADD_Config->AF) << (ADD_Config->Pin * GPIO_PIN_OFFSET_4) );
+    //		((GPIO_Registers_t *)(ADD_Config->Port))->AFRL = Local_TmpReg;
+    //    }
+    //    else
+    //    {
+    //    	Local_TmpReg = ((GPIO_Registers_t *)(ADD_Config->Port))->AFRH;
+    //		Local_TmpReg &= ~( (GPIO_4_BIT_MASK)<< ((ADD_Config->Pin - 8) * GPIO_PIN_OFFSET_4) );
+    //		Local_TmpReg |= ( (ADD_Config->AF) << ((ADD_Config->Pin - 8) * GPIO_PIN_OFFSET_4) );
+    //		((GPIO_Registers_t *)(ADD_Config->Port))->AFRH = Local_TmpReg;
+    //    }
+
+    }
 
     return Ret_ErrorStatus;
 }
+
 
 GPIO_ErrorStatus_t GPIO_SetPinState(void * Copy_Port, u32 Copy_Pin, u8 Copy_State)
 {
     GPIO_ErrorStatus_t Ret_ErrorStatus = GPIO_OK;
     
-    switch(Copy_State)
+    if(!IS_GPIO_PORT(Copy_Port))
     {
-        case GPIO_STATE_LOW:
-            ((GPIO_Registers_t *)Copy_Port)->BSRR = ( 1<< (Copy_Pin+GPIO_BSRR_RESET_OFFSET) );
-            break;
+        Ret_ErrorStatus = GPIO_INVALID_PORT;
+    }
+    else if(!IS_GPIO_PIN(Copy_Pin))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_PIN;
+    }
+    else if(!IS_GPIO_STATE(Copy_State))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_STATE;
+    }
+    else
+    {
+        /* do nothing */
+    }
 
-        case GPIO_STATE_HIGH:
-            ((GPIO_Registers_t *)Copy_Port)->BSRR = (1<< Copy_Pin);
-            break;
+    if(Ret_ErrorStatus == GPIO_OK)
+    {
+        switch(Copy_State)
+        {
+            case GPIO_STATE_LOW:
+                ((GPIO_Registers_t *)Copy_Port)->BSRR = ( 1<< (Copy_Pin+GPIO_BSRR_RESET_OFFSET) );
+                break;
 
-        default:
-            Ret_ErrorStatus = GPIO_NOK;
+            case GPIO_STATE_HIGH:
+                ((GPIO_Registers_t *)Copy_Port)->BSRR = (1<< Copy_Pin);
+                break;
+
+            default:
+                Ret_ErrorStatus = GPIO_NOK;
+        }
     }
     
 
@@ -131,12 +229,33 @@ GPIO_ErrorStatus_t GPIO_SetPinState(void * Copy_Port, u32 Copy_Pin, u8 Copy_Stat
 }
 
 
-u8 GPIO_GetPin(void * Copy_Port, u32 Copy_Pin)
+GPIO_ErrorStatus_t GPIO_GetPin(void * Copy_Port, u32 Copy_Pin, u8 *Add_PinState)
 {
-    u8 Ret_PinState;
+    GPIO_ErrorStatus_t Ret_ErrorStatus = GPIO_OK;
 
-    Ret_PinState = ( ((GPIO_Registers_t *)Copy_Port)->IDR & ( 1 << Copy_Pin) ) >> Copy_Pin;
+    if(!IS_GPIO_PORT(Copy_Port))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_PORT;
+    }
+    else if(!IS_GPIO_PIN(Copy_Pin))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_PIN;
+    }
+    else if(Add_PinState == NULL)
+    {
+        Ret_ErrorStatus = GPIO_NULLPTR;
+    }
+    else
+    {
+        /* do nothing */
+    }
 
-    return Ret_PinState;
+    if(Ret_ErrorStatus == GPIO_OK)
+    {
+        *Add_PinState = ( ((GPIO_Registers_t *)Copy_Port)->IDR & ( 1 << Copy_Pin) ) >> Copy_Pin;
+    }
+
+
+    return Ret_ErrorStatus;
 }
 

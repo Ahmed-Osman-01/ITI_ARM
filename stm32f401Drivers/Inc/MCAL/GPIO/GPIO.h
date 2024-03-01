@@ -82,8 +82,6 @@
 #define GPIO_AF_EVENTOUT        0x0000000F
 
 
-
-
 /* Pin configuration Struct */
 typedef struct
 {
@@ -98,6 +96,14 @@ typedef enum
 {
     GPIO_OK,
     GPIO_NOK,
+    GPIO_NULLPTR,
+    GPIO_INVALID_MODE,
+    GPIO_INVALID_AF,
+    GPIO_INVALID_PORT,
+    GPIO_INVALID_PIN,
+    GPIO_INVALID_SPEED,
+    GPIO_INVALID_STATE,
+
 }GPIO_ErrorStatus_t;
 
 
@@ -126,9 +132,10 @@ GPIO_ErrorStatus_t GPIO_SetPinState(void * Copy_Port, u32 Copy_Pin, u8 Copy_Stat
  * 
  * @param Copy_Port Port containing the Pin
  * @param Copy_Pin Pin number in the port
- * @return u8 State of the Pin (High, Low)
+ * @param Add_PinState The returned state
+ * @return GPIO_ErrorStatus_t Error status
  */
-u8 GPIO_GetPin(void * Copy_Port, u32 Copy_Pin);
+GPIO_ErrorStatus_t GPIO_GetPin(void * Copy_Port, u32 Copy_Pin, u8 *Add_PinState);
 
 
 #endif /* MCAL_GPIO_GPIO_H_ */
