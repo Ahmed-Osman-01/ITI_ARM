@@ -19,6 +19,6 @@ typedef enum
     
 /* DON'T REMOVE _SWITCH_NUM OR ADD ANY SWITCHES AFTER IT */
     _SWITCH_NUM,
-}SWITCH_Name_t;
+}SWITCH_ID_t;
 
 #endif /* HAL_SWITCH_SWITCH_CONFIG_H_ */

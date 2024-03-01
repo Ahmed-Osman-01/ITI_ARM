@@ -11,13 +11,13 @@
 
 const SWITCH_Config_t Switches[_SWITCH_NUM] = {
     [SWITCH_ONE] = {
-        .Port = GPIO_PORT_A,
+        .Port = GPIO_PORT_B,
         .Pin = GPIO_PIN_2,
         .Connection = SWITCH_CONNECTION_PULLUP
     },
 
     [SWITCH_TWO] = {
-        .Port = GPIO_PORT_B,
+        .Port = GPIO_PORT_A,
         .Pin = GPIO_PIN_3,
         .Connection = SWITCH_CONNECTION_PULLDOWN
     },
