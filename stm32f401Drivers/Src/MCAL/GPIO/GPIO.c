@@ -60,7 +60,7 @@
 
 #define IS_GPIO_SPEED(SPEED)   (((SPEED) >= GPIO_SPEED_LOW) && ((SPEED) <= GPIO_SPEED_VHIGH ))
 
-#define IS_VALID_AF(AF)        (((AF) == GPIO_AF_SYSTEM)   || \
+#define IS_GPIO_AF(AF)         (((AF) == GPIO_AF_SYSTEM)   || \
                                 ((AF) == GPIO_AF_TIM1_2)   || \
                                 ((AF) == GPIO_AF_TIM3_5)   || \
                                 ((AF) == GPIO_AF_TIME9_11) || \
@@ -126,6 +126,10 @@ GPIO_ErrorStatus_t GPIO_Init(GPIO_Pin_t* ADD_Config)
     else if(!IS_GPIO_SPEED(ADD_Config->Speed))
     {
         Ret_ErrorStatus = GPIO_INVALID_SPEED;
+    }
+    else if(!IS_GPIO_AF(ADD_Config->AF))
+    {
+        Ret_ErrorStatus = GPIO_INVALID_AF;
     }
     else
     {
