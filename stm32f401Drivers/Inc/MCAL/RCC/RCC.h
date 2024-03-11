@@ -51,48 +51,6 @@ typedef enum
 }RCC_ErrorStatus_t;
 
 
-// typedef enum
-// {
-//     /* AHB1 Peripherals */
-//     RCC_GPIOA  = 0,
-//     RCC_GPIOB  = 1,
-//     RCC_GPIOC  = 2,
-//     RCC_CRC    = 12,
-//     RCC_DMA1   = 21,
-//     RCC_DMA2   = 22,
-
-//     /* AHB2 Peripherals*/
-//     RCC_OTGFS   = 39,
-
-//     /* APB1 Peripherals */
-//     RCC_TIM2   = 64,
-//     RCC_TIM3   = 65,
-//     RCC_TIM4   = 66,
-//     RCC_TIM5   = 67,
-//     RCC_WWDG   = 75,
-//     RCC_SPI2   = 78,
-//     RCC_SPI3   = 79,
-//     RCC_USART2 = 81,
-//     RCC_I2C1   = 85,
-//     RCC_I2C2   = 85,
-//     RCC_I2C3   = 87,
-//     RCC_PWR    = 92,
-
-//     /* APB2 Peripherals */
-//     RCC_TIM1   = 96,
-//     RCC_USART1 = 100,
-//     RCC_USART6 = 101,
-//     RCC_SDIO   = 107,
-//     RCC_SPI1   = 108,
-//     RCC_SPI4   = 109,
-//     RCC_SYSCFG = 110,
-//     RCC_TIM9   = 112,
-//     RCC_TIM10   = 113,
-//     RCC_TIM11   = 114,
-
-// }RCC_Peripheral_t;
-
-
 /* AHB1 Peripherals */
 typedef enum {
     RCC_GPIOA  = (u64)0 + 0x300000000ULL,
