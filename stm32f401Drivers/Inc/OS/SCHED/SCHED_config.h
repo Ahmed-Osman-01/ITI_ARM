@@ -12,8 +12,8 @@
 /* Add or remove Runnables here for each runnable object added to the config array in config.c */
 typedef enum
 {
+    SWITCH_UPDATE,
     APP1_RUNNABLE,
-    APP2_RUNNABLE,
     APP3_RUNNABLE,
     APP4_RUNNABLE,
     APP5_RUNNABLE,

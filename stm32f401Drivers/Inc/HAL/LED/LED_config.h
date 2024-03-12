@@ -13,6 +13,9 @@ typedef enum
 
     LED_ONE,
     LED_TWO,
+    LED_THREE,
+    LED_FOUR,
+    LED_FIVE,
 
 /* DON'T REMOVE _LED_NUM OR ADD ANYTHING AFTER IT */
     _LED_NUM,

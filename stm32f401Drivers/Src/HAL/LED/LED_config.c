@@ -18,8 +18,26 @@ const LED_Config_t Leds[_LED_NUM] = {
     },
     [LED_TWO] = {
         .Port = GPIO_PORT_A,
-        .Pin = GPIO_PIN_1,
+        .Pin = GPIO_PIN_0,
         .Connection = LED_CONNECTION_FORWARD,
         .InitState = LED_STATE_OFF,
     },
+//    [LED_THREE] = {
+//        .Port = GPIO_PORT_A,
+//        .Pin = GPIO_PIN_1,
+//        .Connection = LED_CONNECTION_FORWARD,
+//        .InitState = LED_STATE_OFF,
+//    },
+//    [LED_FOUR] = {
+//        .Port = GPIO_PORT_A,
+//        .Pin = GPIO_PIN_2,
+//        .Connection = LED_CONNECTION_FORWARD,
+//        .InitState = LED_STATE_OFF,
+//    },
+//    [LED_FIVE] = {
+//        .Port = GPIO_PORT_A,
+//        .Pin = GPIO_PIN_3,
+//        .Connection = LED_CONNECTION_FORWARD,
+//        .InitState = LED_STATE_OFF,
+//    },
 };
