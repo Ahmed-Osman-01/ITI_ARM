@@ -60,6 +60,15 @@ LCD_ErrorStatus_t LCD_WriteStringAsync(const u8 * string);
 
 
 /**
+ * @brief  Prints a buffer of data the LCD
+ * 
+ * @param string data to print
+ * @return LCD_ErrorStatus_t 
+ */
+LCD_ErrorStatus_t LCD_WriteBufferAsync(const u8 * data, u16 size);
+
+
+/**
  * @brief Clears the LCD and returns the cursor back to zero position
  * 
  * @return LCD_ErrorStatus_t 

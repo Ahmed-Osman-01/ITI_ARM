@@ -82,10 +82,10 @@ typedef struct
 /* Stores the string to be printed information */
 typedef struct
 {
-    const u8 * string;
+    const u8 * data;
     u8 length;
     u8 currIndex;
-}LCD_StringRequest_t;
+}LCD_WriteRequest_t;
 
 /* Cursor position */
 typedef struct
@@ -133,6 +133,7 @@ typedef enum
 {
     NONE,
     WRITE_STRING,
+    WRITE_BUFFER,
     CLEAR_SCREEN,
     SET_CURSOR_POS,
 }LCD_RequestTypes_t;
@@ -152,7 +153,7 @@ extern const LCD_Pin_t LCD_Pins[LCD_PINS_NUM];
 static LCD_State_t G_LCDState = LCD_OFF;        /* States of LCD */
 
 static LCD_Request_t G_Request;                 
-static LCD_StringRequest_t G_StringReq;         /* Info of the string request */
+static LCD_WriteRequest_t G_WriteReq;         /* Info of the string request */
 static LCD_Pos_t G_Pos;
 
 
@@ -402,7 +403,7 @@ static void InitProcess(void)
     static u8 posLatchCount = 0;
     static u8 changeRow = 0;
 
-    if(G_StringReq.string[G_StringReq.currIndex] != '\0')
+    if(G_WriteReq.string[G_WriteReq.currIndex] != '\0')
     {
 
         if(G_CharCount == 16 && changeRow == 0)
@@ -443,12 +444,12 @@ static void InitProcess(void)
         }
         else
         {
-            WriteData(G_StringReq.string[G_StringReq.currIndex]);
+            WriteData(G_WriteReq.string[G_WriteReq.currIndex]);
             G_OperationLatchCount++;
 
             if(G_OperationLatchCount == LATCH_TARGET_COUNT)
             {
-                G_StringReq.currIndex++;
+                G_WriteReq.currIndex++;
                 G_OperationLatchCount = 0;
 
                 G_CharCount++;
@@ -461,7 +462,7 @@ static void InitProcess(void)
         G_Request.state = AVAILABLE;
         G_Request.type = NONE;
 
-        // G_StringReq.currIndex = 0;  //---------------------->>>
+        // G_WriteReq.currIndex = 0;  //---------------------->>>
         // G_StringReq.string = NULL;  //---------------------->>>
     }
 } */
@@ -471,14 +472,38 @@ static void InitProcess(void)
 static void WriteString(void)
 {
 
-    if(G_StringReq.string[G_StringReq.currIndex] != '\0')
+    if(G_WriteReq.data[G_WriteReq.currIndex] != '\0')
     {
-        WriteData(G_StringReq.string[G_StringReq.currIndex]);
+        WriteData(G_WriteReq.data[G_WriteReq.currIndex]);
         G_OperationLatchCount++;
 
         if(G_OperationLatchCount == LATCH_TARGET_COUNT)
         {
-            G_StringReq.currIndex++;
+            G_WriteReq.currIndex++;
+            G_OperationLatchCount = 0;
+
+            G_CharCount++;
+        }     
+    }
+    else
+    {
+        G_Request.state = AVAILABLE;
+        G_Request.type = NONE;
+
+    }
+}
+
+static void WriteBuffer(void)
+{
+
+    if(G_WriteReq.currIndex < G_WriteReq.length)
+    {
+        WriteData(G_WriteReq.data[G_WriteReq.currIndex]);
+        G_OperationLatchCount++;
+
+        if(G_OperationLatchCount == LATCH_TARGET_COUNT)
+        {
+            G_WriteReq.currIndex++;
             G_OperationLatchCount = 0;
 
             G_CharCount++;
@@ -543,6 +568,10 @@ static void OperationProcess(void)
     if(G_Request.type == WRITE_STRING)
     {
         WriteString();
+    }
+    else if(G_Request.type == WRITE_BUFFER)
+    {
+        WriteBuffer();
     }
     else if(G_Request.type == CLEAR_SCREEN)
     {
@@ -628,14 +657,37 @@ LCD_ErrorStatus_t LCD_WriteStringAsync(const u8 * string)
             G_Request.state = BUSY;
             G_Request.type = WRITE_STRING;
 
-            G_StringReq.string = string;
-            G_StringReq.currIndex = 0;
+            G_WriteReq.data = string;
+            G_WriteReq.currIndex = 0;
         }
     }
 
     return Ret_ErrorStatus;
 }
 
+LCD_ErrorStatus_t LCD_WriteBufferAsync(const u8 * data, u16 size)
+{
+    LCD_ErrorStatus_t Ret_ErrorStatus = LCD_OK;
+
+    if(data == NULL)
+    {
+        Ret_ErrorStatus = LCD_NOK;
+    }
+    else
+    {
+        if(G_Request.state == AVAILABLE)
+        {
+            G_Request.state = BUSY;
+            G_Request.type = WRITE_BUFFER;
+
+            G_WriteReq.data = data;
+            G_WriteReq.length = size;
+            G_WriteReq.currIndex = 0;
+        }
+    }
+
+    return Ret_ErrorStatus;
+}
 
 LCD_ErrorStatus_t LCD_ClearScreenAsync(void)
 {
