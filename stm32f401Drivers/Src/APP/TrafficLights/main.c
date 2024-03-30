@@ -6,6 +6,9 @@
  */
 
 
+#if 0
+
+
 
 #include "LIB/STD_TYPES.h"
 #include "MCAL/RCC/RCC.h"
@@ -31,3 +34,6 @@ int main(void)
 
     return 0;
 }
+
+
+#endif

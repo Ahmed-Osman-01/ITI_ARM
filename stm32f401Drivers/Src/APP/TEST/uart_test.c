@@ -14,7 +14,7 @@
 #include "MCAL/UART/UART.h"
 #include "MCAL/NVIC/NVIC.h"
 #include "MCAL/GPIO/GPIO.h"
-#include "OS/SCHED/SCHED.h"
+#include "SERVICE/SCHED/SCHED.h"
 
 #include "HAL/LCD/LCD.h"
 #include "HAL/LED/LED.h"
@@ -72,11 +72,12 @@ int main(void)
     uart1Config.Mode = UART_MODE_TX_RX;
     uart1Config.Parity = UART_PARITY_DISABLE;
     uart1Config.Sampling = UART_SAMPLING_16;
-    uart1Config.WordLength = UART_LENGTH_8;
+    uart1Config.WordLength = UART_WORDLENGTH_8;
 
     UART_SetConfig(UART2, &uart1Config);
 
     LCD_Init();
+    LED_Init();
 
     blinkingLed_Init();
 
@@ -104,13 +105,13 @@ void lcdAppClear(void)
 
 	if(input == '0')
 	{
-		LED_SetState(RED_LED, LED_STATE_OFF);
+		LED_SetState(LED_ONE, LED_STATE_OFF);
 		LCD_ClearScreenAsync();
 
 	}
 	else if(input == '1')
 	{
-		LED_SetState(RED_LED, LED_STATE_ON);
+		LED_SetState(LED_ONE, LED_STATE_ON);
 		UART_RXBufferAsyncZC(UART2, buffer, 7, rxCB);
 	}
 }

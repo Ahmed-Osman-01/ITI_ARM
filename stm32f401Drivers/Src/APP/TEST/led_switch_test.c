@@ -6,6 +6,9 @@
  */
 
 
+
+#if 0
+
 #include "LIB/STD_TYPES.h"
 #include "MCAL/RCC/RCC.h"
 #include "HAL/LED/LED.h"
@@ -28,7 +31,7 @@ int main(void)
 
 	while(1)
 	{
-		state = SWITCH_GetSwitchState(SWITCH_ONE);
+		SWITCH_GetSwitchState(SWITCH_ONE, &state);
 
 		if(state == SWITCH_STATE_PRESSED)
 		{
@@ -44,3 +47,4 @@ int main(void)
 	}
 	return 0;
 }
+#endif
