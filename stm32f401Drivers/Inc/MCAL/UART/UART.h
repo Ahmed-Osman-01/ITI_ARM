@@ -36,9 +36,9 @@
 /* ------------------------------------------------ */
 /*              Available UARTs                     */
 /* ------------------------------------------------ */
-#define UART1         (u64)0x040011000
-#define UART2         (u64)0x140004400
-#define UART6         (u64)0x240011400
+#define UART1         0U
+#define UART2         1U
+#define UART6         2U
 
 /* ============================================================================ */
 /*                                  	TYPES                           	    */
@@ -95,7 +95,7 @@ typedef enum
  * @param config Configuration Struct
  * @return UART_ErrorStatus_t 
  */
-UART_ErrorStatus_t  UART_SetConfig(u64 UARTx, UART_Config_t* config);
+UART_ErrorStatus_t  UART_SetConfig(u8 UARTx, UART_Config_t* config);
 
 
 /**
@@ -105,7 +105,7 @@ UART_ErrorStatus_t  UART_SetConfig(u64 UARTx, UART_Config_t* config);
  * @param byte Byte to Send
  * @return UART_ErrorStatus_t 
  */
-UART_ErrorStatus_t UART_TXByte(u64 UARTx, u8 byte);
+UART_ErrorStatus_t UART_TXByte(u8 UARTx, u8 byte);
 
 
 /**
@@ -118,7 +118,7 @@ UART_ErrorStatus_t UART_TXByte(u64 UARTx, u8 byte);
  * @param cb Function to call after the transfere is completed
  * @return UART_ErrorStatus_t 
  */
-UART_ErrorStatus_t UART_TXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UART_ReqCallback_t cb );
+UART_ErrorStatus_t UART_TXBufferAsyncZC(u8  UARTx, u8 * buffer, u16 length, UART_ReqCallback_t cb );
 
 
 /**
@@ -128,7 +128,7 @@ UART_ErrorStatus_t UART_TXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UAR
  * @param byte Received byte
  * @return UART_ErrorStatus_t 
  */
-UART_ErrorStatus_t UART_RXByte(u64 UARTx, u8 *byte);
+UART_ErrorStatus_t UART_RXByte(u8 UARTx, u8 *byte);
 
 
 /**
@@ -141,6 +141,6 @@ UART_ErrorStatus_t UART_RXByte(u64 UARTx, u8 *byte);
  * @param cb Function to call after the buffer is filled (Received the buffer)
  * @return UART_ErrorStatus_t 
  */
-UART_ErrorStatus_t UART_RXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UART_ReqCallback_t cb );
+UART_ErrorStatus_t UART_RXBufferAsyncZC(u8  UARTx, u8 * buffer, u16 length, UART_ReqCallback_t cb );
 
 #endif /* MCAL_UART_UART_H_ */

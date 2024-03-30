@@ -25,7 +25,6 @@
 #define TXE_TIMEOUT_VAL     600     /* Timeout count in cast of Synchronous Transfere of a byte */
 #define RXE_TIMEOUT_VAL     600     /* Timeout count in cast of Synchronous Recieve of a byte */
 
-#define UART(UARTx)  ((UART_Registers_t*)UARTx)
 
 #define MANTISSA_POS    4U          /* Position of the mantissa part in the BRR */
 
@@ -121,6 +120,10 @@ typedef struct
 /*                                  GLOBAL VARIABLES                    	    */
 /* ============================================================================ */
 
+
+static UART_Registers_t* UARTs[_UARTS_NUM] = {(UART_Registers_t*)0x40011000, (UART_Registers_t*)0x40004400,
+											  (UART_Registers_t*)0x40011400};
+
 static UART_Req_t TXRequests[_UARTS_NUM];
 static UART_Req_t RXRequests[_UARTS_NUM];
 
@@ -130,7 +133,7 @@ static UART_Req_t RXRequests[_UARTS_NUM];
 /* ============================================================================ */
 
 
-UART_ErrorStatus_t  UART_SetConfig(u64 UARTx, UART_Config_t* config)
+UART_ErrorStatus_t  UART_SetConfig(u8 uartID, UART_Config_t* config)
 {
     UART_ErrorStatus_t Ret_ErrorStatus = UART_OK;
     u32 tmpReg;
@@ -138,7 +141,7 @@ UART_ErrorStatus_t  UART_SetConfig(u64 UARTx, UART_Config_t* config)
     u8 mantissa;
     u32 fraction;
 
-    if(!IS_VALID_UART(UARTx))
+    if(!IS_VALID_UART(uartID))
     {
         Ret_ErrorStatus = UART_INVALID_UART;
     }
@@ -170,19 +173,19 @@ UART_ErrorStatus_t  UART_SetConfig(u64 UARTx, UART_Config_t* config)
 
     if(Ret_ErrorStatus == UART_OK)
     {
-        tmpReg = UART(UARTx)->CR1;
+        tmpReg = UARTs[uartID]->CR1;
         tmpReg &= (~UART_MODE_MASK) | (~UART_RXNEIE_MASK) | (~UART_TXEIE_MASK) | (~UART_PARITY_MASK)|\
                     (~UART_LENGTH_MASK) | (~UART_SAMPLING_MASK);
         tmpReg |= (config->Mode) | (config->Parity) | (config->WordLength) | (config->Sampling) | (UART_UE_MASK);
-        UART(UARTx)->CR1 = tmpReg;
+        UARTs[uartID]->CR1 = tmpReg;
 
         /* Calculate Mantissa and Fraction for BaudRate*/
 
-        uartdiv = ((u64)_CLK_FREQ * 1000)/((2-(UART(UARTx)->CR1 & UART_SAMPLING_MASK)) * 8 * config->BaudRate);
+        uartdiv = ((u64)_CLK_FREQ * 1000)/((2-(UARTs[uartID]->CR1 & UART_SAMPLING_MASK)) * 8 * config->BaudRate);
 
         mantissa = uartdiv/1000;
 
-        fraction = (uartdiv % 1000) * ((2-(UART(UARTx)->CR1 & UART_SAMPLING_MASK)) * 8);
+        fraction = (uartdiv % 1000) * ((2-(UARTs[uartID]->CR1 & UART_SAMPLING_MASK)) * 8);
         
 
         if(fraction % 1000 >= 500)
@@ -194,19 +197,19 @@ UART_ErrorStatus_t  UART_SetConfig(u64 UARTx, UART_Config_t* config)
             fraction = fraction/1000;
         }
 
-        if( ((UART(UARTx)->CR1 & UART_SAMPLING_MASK) == UART_SAMPLING_16) && (fraction > 15) )
+        if( ((UARTs[uartID]->CR1 & UART_SAMPLING_MASK) == UART_SAMPLING_16) && (fraction > 15) )
         {
             fraction = 0;
             mantissa++;
         }
 
-        if( ((UART(UARTx)->CR1 & UART_SAMPLING_MASK) == UART_SAMPLING_8) && (fraction > 7) )
+        if( ((UARTs[uartID]->CR1 & UART_SAMPLING_MASK) == UART_SAMPLING_8) && (fraction > 7) )
         {
             fraction = 0;
             mantissa++;
         }
 
-        UART(UARTx)->BRR = (mantissa << MANTISSA_POS) | fraction;
+        UARTs[uartID]->BRR = (mantissa << MANTISSA_POS) | fraction;
 
     }
 
@@ -214,12 +217,12 @@ UART_ErrorStatus_t  UART_SetConfig(u64 UARTx, UART_Config_t* config)
 }
 
 
-UART_ErrorStatus_t UART_TXByte(u64 UARTx, u8 byte)
+UART_ErrorStatus_t UART_TXByte(u8 uartID, u8 byte)
 {
     UART_ErrorStatus_t Ret_ErrorStatus = UART_OK;
     u16 timeout = TXE_TIMEOUT_VAL;
 
-    if(!IS_VALID_UART(UARTx))
+    if(!IS_VALID_UART(uartID))
     {
         Ret_ErrorStatus = UART_INVALID_UART;
     }
@@ -231,16 +234,16 @@ UART_ErrorStatus_t UART_TXByte(u64 UARTx, u8 byte)
     if(Ret_ErrorStatus == UART_OK)
     {
         /* Disable TXE Interrupt */
-        UART(UARTx)->CR1 &= ~UART_TXEIE_MASK;
+        UARTs[uartID]->CR1 &= ~UART_TXEIE_MASK;
         /* Send the Byte */
-        UART(UARTx)->DR = byte;
+        UARTs[uartID]->DR = byte;
         /* Wait till Byte is sent */
-        while( ((UART(UARTx)->SR & UART_TXE_MASK) == 0) && timeout )
+        while( ((UARTs[uartID]->SR & UART_TXE_MASK) == 0) && timeout )
         {
             timeout--;
         }
 
-        if( (timeout == 0) && ((UART(UARTx)->SR & UART_TXE_MASK) == 0))
+        if( (timeout == 0) && ((UARTs[uartID]->SR & UART_TXE_MASK) == 0))
         {
             Ret_ErrorStatus = UART_TX_TIMEOUT;
         }
@@ -250,12 +253,11 @@ UART_ErrorStatus_t UART_TXByte(u64 UARTx, u8 byte)
 }
 
 
-UART_ErrorStatus_t UART_TXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UART_ReqCallback_t cb )
+UART_ErrorStatus_t UART_TXBufferAsyncZC(u8 uartID, u8 * buffer, u16 length, UART_ReqCallback_t cb )
 {
     UART_ErrorStatus_t Ret_ErrorStatus = UART_OK;
-    u8 uartNumber;
 
-    if(!IS_VALID_UART(UARTx))
+    if(!IS_VALID_UART(uartID))
     {
         Ret_ErrorStatus = UART_INVALID_UART;
     }
@@ -270,21 +272,21 @@ UART_ErrorStatus_t UART_TXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UAR
 
     if(Ret_ErrorStatus == UART_OK)
     {
-        uartNumber = (u64)UARTx >> 32;
-        if(TXRequests[uartNumber].State == READY)
+       
+        if(TXRequests[uartID].State == READY)
         {
-            TXRequests[uartNumber].State = BUSY;
-            TXRequests[uartNumber].Cb = cb;
+            TXRequests[uartID].State = BUSY;
+            TXRequests[uartID].Cb = cb;
 
-            TXRequests[uartNumber].Buffer.Data = buffer;
-            TXRequests[uartNumber].Buffer.Length = length;
+            TXRequests[uartID].Buffer.Data = buffer;
+            TXRequests[uartID].Buffer.Length = length;
 
             /* Send the firts byte to start the chain */
-            TXRequests[uartNumber].Buffer.CurrIdx = 1;
-            UART(UARTx)->DR = TXRequests[uartNumber].Buffer.Data[0];
+            TXRequests[uartID].Buffer.CurrIdx = 1;
+            UARTs[uartID]->DR = TXRequests[uartID].Buffer.Data[0];
 
             /* Enable TXE interrupt */
-            UART(UARTx)->CR1 |= UART_TXEIE_MASK;
+            UARTs[uartID]->CR1 |= UART_TXEIE_MASK;
         }
     }
 
@@ -292,12 +294,12 @@ UART_ErrorStatus_t UART_TXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UAR
 }
 
 
-UART_ErrorStatus_t UART_RXByte(u64 UARTx, u8 *byte)
+UART_ErrorStatus_t UART_RXByte(u8 uartID, u8 *byte)
 {
     UART_ErrorStatus_t Ret_ErrorStatus = UART_OK;
     u16 timeout = RXE_TIMEOUT_VAL;
 
-    if(!IS_VALID_UART(UARTx))
+    if(!IS_VALID_UART(uartID))
     {
         Ret_ErrorStatus = UART_INVALID_UART;
     }
@@ -313,22 +315,22 @@ UART_ErrorStatus_t UART_RXByte(u64 UARTx, u8 *byte)
     if(Ret_ErrorStatus == UART_OK)
     {
         /* Disable RXNE Interrupt */
-        UART(UARTx)->CR1 &= ~UART_RXNEIE_MASK;
+        UARTs[uartID]->CR1 &= ~UART_RXNEIE_MASK;
 
         /* Wait till Byte is recieved */
-        while( ((UART(UARTx)->SR & UART_TXE_MASK) == 0) && timeout )
+        while( ((UARTs[uartID]->SR & UART_TXE_MASK) == 0) && timeout )
         {
             timeout--;
         }
 
-        if( (timeout == 0) && ((UART(UARTx)->SR & UART_TXE_MASK) == 0))
+        if( (timeout == 0) && ((UARTs[uartID]->SR & UART_TXE_MASK) == 0))
         {
             Ret_ErrorStatus = UART_RX_TIMEOUT;
         }
         else
         {
             /* Get value if no timeout */
-            *byte = UART(UARTx)->DR;
+            *byte = UARTs[uartID]->DR;
         }
 
     }
@@ -337,12 +339,11 @@ UART_ErrorStatus_t UART_RXByte(u64 UARTx, u8 *byte)
 }
 
 
-UART_ErrorStatus_t UART_RXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UART_ReqCallback_t cb )
+UART_ErrorStatus_t UART_RXBufferAsyncZC(u8 uartID, u8 * buffer, u16 length, UART_ReqCallback_t cb )
 {
     UART_ErrorStatus_t Ret_ErrorStatus = UART_OK;
-    u8 uartNumber;
 
-    if(!IS_VALID_UART(UARTx))
+    if(!IS_VALID_UART(uartID))
     {
         Ret_ErrorStatus = UART_INVALID_UART;
     }
@@ -358,22 +359,21 @@ UART_ErrorStatus_t UART_RXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UAR
 
      if(Ret_ErrorStatus == UART_OK)
     {
-        uartNumber = (u64)UARTx >> 32;
-        if(RXRequests[uartNumber].State == READY)
+        if(RXRequests[uartID].State == READY)
         {
-            RXRequests[uartNumber].State = BUSY;
-            RXRequests[uartNumber].Cb = cb;
+            RXRequests[uartID].State = BUSY;
+            RXRequests[uartID].Cb = cb;
 
-            RXRequests[uartNumber].Buffer.Data = buffer;
-            RXRequests[uartNumber].Buffer.Length = length;
+            RXRequests[uartID].Buffer.Data = buffer;
+            RXRequests[uartID].Buffer.Length = length;
 
-            RXRequests[uartNumber].Buffer.CurrIdx = 0;
+            RXRequests[uartID].Buffer.CurrIdx = 0;
 
             /* Clear RXNE flag */
-            UART(UARTx)->SR &= ~UART_RXNE_MASK;
+            UARTs[uartID]->SR &= ~UART_RXNE_MASK;
 
             /* Enable RXNE interrupt */
-            UART(UARTx)->CR1 |= UART_RXNEIE_MASK;
+            UARTs[uartID]->CR1 |= UART_RXNEIE_MASK;
 
         }
     }
@@ -385,35 +385,35 @@ UART_ErrorStatus_t UART_RXBufferAsyncZC(u64  UARTx, u8 * buffer, u16 length, UAR
 
 void USART1_IRQHandler(void)
 {
-    if(UART(UART1)->SR & UART_TXE_MASK)
+    if(UARTs[UART1]->SR & UART_TXE_MASK)
     {
         if(TXRequests[UART1_INDEX].Buffer.CurrIdx < TXRequests[UART1_INDEX].Buffer.Length)
         {
-            UART(UART1)->DR = TXRequests[UART1_INDEX].Buffer.Data[TXRequests[UART1_INDEX].Buffer.CurrIdx];
+            UARTs[UART1]->DR = TXRequests[UART1_INDEX].Buffer.Data[TXRequests[UART1_INDEX].Buffer.CurrIdx];
             TXRequests[UART1_INDEX].Buffer.CurrIdx++;
         }
         else
         {
             TXRequests[UART1_INDEX].State = READY;
             /* DISABLE TXE interrupt */
-            UART(UART1)->CR1 &= ~UART_TXEIE_MASK;
+            UARTs[UART1]->CR1 &= ~UART_TXEIE_MASK;
 
             TXRequests[UART1_INDEX].Cb();
         }
     }
 
-    if(UART(UART1)->SR & UART_RXNE_MASK)
+    if(UARTs[UART1]->SR & UART_RXNE_MASK)
     {
         if(RXRequests[UART1_INDEX].Buffer.CurrIdx < RXRequests[UART1_INDEX].Buffer.Length)
         {
-            RXRequests[UART1_INDEX].Buffer.Data[RXRequests[UART1_INDEX].Buffer.CurrIdx] = UART(UART1)->DR;
+            RXRequests[UART1_INDEX].Buffer.Data[RXRequests[UART1_INDEX].Buffer.CurrIdx] = UARTs[UART1]->DR;
             RXRequests[UART1_INDEX].Buffer.CurrIdx++;
 
             if(RXRequests[UART1_INDEX].Buffer.CurrIdx == RXRequests[UART1_INDEX].Buffer.Length)
             {
                 RXRequests[UART1_INDEX].State = READY;
                 /* DISABLE RXE interrupt */
-                UART(UART1)->CR1 &= ~UART_RXNEIE_MASK;
+                UARTs[UART1]->CR1 &= ~UART_RXNEIE_MASK;
 
                 RXRequests[UART1_INDEX].Cb();
             }
@@ -425,35 +425,35 @@ void USART1_IRQHandler(void)
 
 void USART2_IRQHandler(void)
 {
-    if(UART(UART2)->SR & UART_TXE_MASK)
+    if(UARTs[UART2]->SR & UART_TXE_MASK)
     {
         if(TXRequests[UART2_INDEX].Buffer.CurrIdx < TXRequests[UART2_INDEX].Buffer.Length)
         {
-            UART(UART2)->DR = TXRequests[UART2_INDEX].Buffer.Data[TXRequests[UART2_INDEX].Buffer.CurrIdx];
+            UARTs[UART2]->DR = TXRequests[UART2_INDEX].Buffer.Data[TXRequests[UART2_INDEX].Buffer.CurrIdx];
             TXRequests[UART2_INDEX].Buffer.CurrIdx++;
         }
         else
         {
             TXRequests[UART2_INDEX].State = READY;
             /* DISABLE TXE interrupt */
-            UART(UART2)->CR1 &= ~UART_TXEIE_MASK;
+            UARTs[UART2]->CR1 &= ~UART_TXEIE_MASK;
 
             TXRequests[UART2_INDEX].Cb();
         }
     }
 
-    if(UART(UART2)->SR & UART_RXNE_MASK)
+    if(UARTs[UART2]->SR & UART_RXNE_MASK)
     {
         if(RXRequests[UART2_INDEX].Buffer.CurrIdx < RXRequests[UART2_INDEX].Buffer.Length)
         {
-            RXRequests[UART2_INDEX].Buffer.Data[RXRequests[UART2_INDEX].Buffer.CurrIdx] = UART(UART2)->DR;
+            RXRequests[UART2_INDEX].Buffer.Data[RXRequests[UART2_INDEX].Buffer.CurrIdx] = UARTs[UART2]->DR;
             RXRequests[UART2_INDEX].Buffer.CurrIdx++;
 
             if(RXRequests[UART2_INDEX].Buffer.CurrIdx == RXRequests[UART2_INDEX].Buffer.Length)
             {
                 RXRequests[UART2_INDEX].State = READY;
                 /* DISABLE RXE interrupt */
-                UART(UART2)->CR1 &= ~UART_RXNEIE_MASK;
+                UARTs[UART2]->CR1 &= ~UART_RXNEIE_MASK;
 
                 RXRequests[UART2_INDEX].Cb();
             }
@@ -465,35 +465,35 @@ void USART2_IRQHandler(void)
 
 void USART6_IRQHandler(void)
 {
-    if(UART(UART6)->SR & UART_TXE_MASK)
+    if(UARTs[UART6]->SR & UART_TXE_MASK)
     {
         if(TXRequests[UART6_INDEX].Buffer.CurrIdx < TXRequests[UART6_INDEX].Buffer.Length)
         {
-            UART(UART6)->DR = TXRequests[UART6_INDEX].Buffer.Data[TXRequests[UART6_INDEX].Buffer.CurrIdx];
+            UARTs[UART6]->DR = TXRequests[UART6_INDEX].Buffer.Data[TXRequests[UART6_INDEX].Buffer.CurrIdx];
             TXRequests[UART6_INDEX].Buffer.CurrIdx++;
         }
         else
         {
             TXRequests[UART6_INDEX].State = READY;
             /* DISABLE TXE interrupt */
-            UART(UART6)->CR1 &= ~UART_TXEIE_MASK;
+            UARTs[UART6]->CR1 &= ~UART_TXEIE_MASK;
 
             TXRequests[UART6_INDEX].Cb();
         }
     }
 
-    if(UART(UART6)->SR & UART_RXNE_MASK)
+    if(UARTs[UART6]->SR & UART_RXNE_MASK)
     {
         if(RXRequests[UART6_INDEX].Buffer.CurrIdx < RXRequests[UART6_INDEX].Buffer.Length)
         {
-            RXRequests[UART6_INDEX].Buffer.Data[RXRequests[UART6_INDEX].Buffer.CurrIdx] = UART(UART6)->DR;
+            RXRequests[UART6_INDEX].Buffer.Data[RXRequests[UART6_INDEX].Buffer.CurrIdx] = UARTs[UART6]->DR;
             RXRequests[UART6_INDEX].Buffer.CurrIdx++;
 
             if(RXRequests[UART6_INDEX].Buffer.CurrIdx == RXRequests[UART6_INDEX].Buffer.Length)
             {
                 RXRequests[UART6_INDEX].State = READY;
                 /* DISABLE TXE interrupt */
-                UART(UART6)->CR1 &= ~UART_RXNEIE_MASK;
+                UARTs[UART6]->CR1 &= ~UART_RXNEIE_MASK;
 
                 RXRequests[UART6_INDEX].Cb();
             }

@@ -1,0 +1,2 @@
+../Src/APP/TrafficLights/blinkingLed.c:27:6:blinkingLed_Init	1
+../Src/APP/TrafficLights/blinkingLed.c:33:6:blinkingLed_Update	1

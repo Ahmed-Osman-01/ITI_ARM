@@ -1,0 +1,5 @@
+../Src/APP/TEST/uart_test.c:27:6:fun	1
+../Src/APP/TEST/uart_test.c:32:6:rxCB	1
+../Src/APP/TEST/uart_test.c:38:5:main	1
+../Src/APP/TEST/uart_test.c:91:6:lcdApp	1
+../Src/APP/TEST/uart_test.c:99:6:uartApp	3

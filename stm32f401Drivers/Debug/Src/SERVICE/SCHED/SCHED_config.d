@@ -1,0 +1,6 @@
+Src/SERVICE/SCHED/SCHED_config.o: ../Src/SERVICE/SCHED/SCHED_config.c \
+ ../Inc/LIB/STD_TYPES.h ../Inc/SERVICE/SCHED/SCHED.h \
+ ../Inc/SERVICE/SCHED/SCHED_config.h
+../Inc/LIB/STD_TYPES.h:
+../Inc/SERVICE/SCHED/SCHED.h:
+../Inc/SERVICE/SCHED/SCHED_config.h:

@@ -13,10 +13,10 @@ typedef enum
 
 	BLINKING_LED,
 	LED_ONE,
-    LED_TWO,
-    RED_LED,
-    GREEN_LED,
-    YELLOW_LED,
+//    LED_TWO,
+//    RED_LED,
+//    GREEN_LED,
+//    YELLOW_LED,
 
 /* DON'T REMOVE _LED_NUM OR ADD ANYTHING AFTER IT */
     _LED_NUM,

@@ -1,2 +1,2 @@
-../Src/HAL/LED/LED.c:15:19:LED_Init	2
-../Src/HAL/LED/LED.c:35:19:LED_SetState	1
+../Src/HAL/LED/LED.c:34:19:LED_Init	5
+../Src/HAL/LED/LED.c:67:19:LED_SetState	5

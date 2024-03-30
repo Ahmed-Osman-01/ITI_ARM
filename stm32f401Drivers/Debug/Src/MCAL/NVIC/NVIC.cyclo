@@ -1,0 +1,13 @@
+../Src/MCAL/NVIC/NVIC.c:87:27:NVIC_SetBitInReg	3
+../Src/MCAL/NVIC/NVIC.c:107:27:NVIC_GetBitInReg	3
+../Src/MCAL/NVIC/NVIC.c:136:20:NVIC_EnableInterrupt	1
+../Src/MCAL/NVIC/NVIC.c:145:20:NVIC_DisableInterrupt	1
+../Src/MCAL/NVIC/NVIC.c:155:20:NVIC_SetPending	1
+../Src/MCAL/NVIC/NVIC.c:164:20:NVIC_ClearPending	1
+../Src/MCAL/NVIC/NVIC.c:173:20:NVIC_GetPending	1
+../Src/MCAL/NVIC/NVIC.c:182:20:NVIC_GetActive	1
+../Src/MCAL/NVIC/NVIC.c:192:20:NVIC_SetPeriority	4
+../Src/MCAL/NVIC/NVIC.c:218:20:NVIC_GetPeriority	4
+../Src/MCAL/NVIC/NVIC.c:245:20:NVIC_EncodePeriority	3
+../Src/MCAL/NVIC/NVIC.c:262:20:NVIC_SetSubGroupsBits	4
+../Src/MCAL/NVIC/NVIC.c:292:20:NVIC_GetSubGroupsBits	3

@@ -1,0 +1,8 @@
+../Src/MCAL/UART/UART.c:136:21:UART_SetConfig	32	static
+../Src/MCAL/UART/UART.c:220:20:UART_TXByte	24	static
+../Src/MCAL/UART/UART.c:256:20:UART_TXBufferAsyncZC	32	static
+../Src/MCAL/UART/UART.c:297:20:UART_RXByte	24	static
+../Src/MCAL/UART/UART.c:342:20:UART_RXBufferAsyncZC	32	static
+../Src/MCAL/UART/UART.c:386:6:USART1_IRQHandler	8	static
+../Src/MCAL/UART/UART.c:426:6:USART2_IRQHandler	8	static
+../Src/MCAL/UART/UART.c:466:6:USART6_IRQHandler	8	static

@@ -96,7 +96,7 @@ void lcdApp(void)
 
 }
 
-void lcdAppClear(void)
+void uartApp(void)
 {
 	u8 input = 0;
 

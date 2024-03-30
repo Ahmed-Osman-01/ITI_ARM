@@ -11,7 +11,7 @@
 
 #include "LIB/STD_TYPES.h"
 #include "HAL/LED/LED.h"
-#include "MCAL/GPIO/GPIO.h "
+#include "MCAL/GPIO/GPIO.h"
 
 /* ============================================================================ */
 /*                                  VALIDATION MACROS                          	*/

@@ -1,0 +1,4 @@
+Src/MCAL/UART/UART.o: ../Src/MCAL/UART/UART.c ../Inc/LIB/STD_TYPES.h \
+ ../Inc/MCAL/UART/UART.h
+../Inc/LIB/STD_TYPES.h:
+../Inc/MCAL/UART/UART.h:
