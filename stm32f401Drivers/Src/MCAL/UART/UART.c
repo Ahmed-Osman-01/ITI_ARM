@@ -423,6 +423,8 @@ UART_ErrorStatus_t UART_ConfigLIN(u8 UARTx, UART_LIN_Config_t* Config)
         tempReg |= (Config->State) | (Config->BreakDetectLength) | (Config->BreakDetectInterrupt);
         UARTs[UARTx]->CR2 = tempReg;
     }
+
+    return Ret_ErrorStatus;
 }
 
 

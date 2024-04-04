@@ -13,6 +13,8 @@
 #include "MCAL/GPIO/GPIO.h"
 #include "SERVICE/SCHED/SCHED.h"
 
+#include "COMM/LIN/LIN_HW.h"
+
 #include "HAL/LCD/LCD.h"
 #include "HAL/LED/LED.h"
 
@@ -66,33 +68,8 @@ int main(void)
 	ledPin.Speed = GPIO_SPEED_HIGH;
 	GPIO_Init(&ledPin);
 
+	LIN_HW_Init();
 
-    GPIO_Pin_t uart2TX;
-    GPIO_Pin_t uart2RX;
-
-    uart2TX.Mode = GPIO_MODE_AF_PP;
-    uart2TX.AF = GPIO_AF_USART1_2;
-    uart2TX.Pin = GPIO_PIN_2;
-    uart2TX.Port = GPIO_PORT_A;
-    uart2TX.Speed = GPIO_SPEED_HIGH;
-
-    uart2RX.Mode = GPIO_MODE_AF_PP;
-    uart2RX.AF = GPIO_AF_USART1_2;
-    uart2RX.Pin = GPIO_PIN_3;
-    uart2RX.Port = GPIO_PORT_A;
-    uart2RX.Speed = GPIO_SPEED_HIGH;
-
-    GPIO_Init(&uart2TX);
-    GPIO_Init(&uart2RX);
-
-    UART_Config_t uart1Config;
-    uart1Config.BaudRate = 9600;
-    uart1Config.Mode = UART_MODE_TX_RX;
-    uart1Config.Parity = UART_PARITY_DISABLE;
-    uart1Config.Sampling = UART_SAMPLING_16;
-    uart1Config.WordLength = UART_WORDLENGTH_8;
-
-    UART_SetConfig(UART2, &uart1Config);
 
     LCD_Init();
     LED_Init();
