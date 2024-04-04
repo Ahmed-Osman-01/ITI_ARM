@@ -24,6 +24,7 @@ C_DEPS :=
 SUBDIRS := \
 Src/APP/TEST \
 Src/APP/TrafficLights \
+Src/COMM/LIN \
 Src/HAL/LCD \
 Src/HAL/LED \
 Src/HAL/SWITCH \

@@ -135,7 +135,7 @@ GPIO_ErrorStatus_t GPIO_SetPinState(void * Copy_Port, u32 Copy_Pin, u8 Copy_Stat
  * @param Add_PinState The returned state
  * @return GPIO_ErrorStatus_t Error status
  */
-GPIO_ErrorStatus_t GPIO_GetPin(void * Copy_Port, u32 Copy_Pin, u8 *Add_PinState);
+GPIO_ErrorStatus_t GPIO_GetPinState(void * Copy_Port, u32 Copy_Pin, u8 *Add_PinState);
 
 
 #endif /* MCAL_GPIO_GPIO_H_ */

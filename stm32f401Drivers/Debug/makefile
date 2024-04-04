@@ -19,6 +19,7 @@ RM := rm -rf
 -include Src/HAL/SWITCH/subdir.mk
 -include Src/HAL/LED/subdir.mk
 -include Src/HAL/LCD/subdir.mk
+-include Src/COMM/LIN/subdir.mk
 -include Src/APP/TrafficLights/subdir.mk
 -include Src/APP/TEST/subdir.mk
 -include objects.mk

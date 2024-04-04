@@ -233,7 +233,7 @@ GPIO_ErrorStatus_t GPIO_SetPinState(void * Copy_Port, u32 Copy_Pin, u8 Copy_Stat
 }
 
 
-GPIO_ErrorStatus_t GPIO_GetPin(void * Copy_Port, u32 Copy_Pin, u8 *Add_PinState)
+GPIO_ErrorStatus_t GPIO_GetPinState(void * Copy_Port, u32 Copy_Pin, u8 *Add_PinState)
 {
     GPIO_ErrorStatus_t Ret_ErrorStatus = GPIO_OK;
 

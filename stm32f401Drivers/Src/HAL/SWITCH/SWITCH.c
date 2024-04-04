@@ -91,7 +91,7 @@ void SWITCH_Update(void)
 
     for(currSwitch = 0; currSwitch < _SWITCH_NUM; currSwitch++)
     {
-        GPIO_GetPin(Switches[currSwitch].Port, Switches[currSwitch].Pin, &currHWState);
+        GPIO_GetPinState(Switches[currSwitch].Port, Switches[currSwitch].Pin, &currHWState);
 
         /* This line to return Either Pressed Or Released Regardless of the Connection
             If The connection is PullUp then inverse the returned state from GPIO to match the

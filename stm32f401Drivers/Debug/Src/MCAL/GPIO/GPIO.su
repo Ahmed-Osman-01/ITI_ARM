@@ -1,3 +1,3 @@
-../Src/MCAL/GPIO/GPIO.c:54:20:GPIO_Init	80	static
-../Src/MCAL/GPIO/GPIO.c:111:20:GPIO_SetPinState	32	static
-../Src/MCAL/GPIO/GPIO.c:134:4:GPIO_GetPin	24	static
+../Src/MCAL/GPIO/GPIO.c:104:20:GPIO_Init	80	static
+../Src/MCAL/GPIO/GPIO.c:193:20:GPIO_SetPinState	32	static
+../Src/MCAL/GPIO/GPIO.c:236:20:GPIO_GetPinState	32	static

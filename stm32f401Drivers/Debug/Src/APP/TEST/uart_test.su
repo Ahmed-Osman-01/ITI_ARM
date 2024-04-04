@@ -1,5 +1,0 @@
-../Src/APP/TEST/uart_test.c:27:6:fun	4	static
-../Src/APP/TEST/uart_test.c:32:6:rxCB	8	static
-../Src/APP/TEST/uart_test.c:38:5:main	72	static
-../Src/APP/TEST/uart_test.c:91:6:lcdApp	8	static
-../Src/APP/TEST/uart_test.c:99:6:uartApp	16	static
