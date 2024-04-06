@@ -19,6 +19,9 @@
 #define LCD_MODE    LCD_4_BIT_MODE
 
 
+/* Max size of LCD requests to be buffered and executed at once */
+#define REQUEST_BUFFER_SIZE     5
+
 
 
 /**

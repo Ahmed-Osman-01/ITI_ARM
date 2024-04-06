@@ -58,6 +58,7 @@
 
 
 
+
 /* ============================================================================ */
 /*                                  	TYPES                           	    */
 /* ============================================================================ */
@@ -76,23 +77,14 @@ typedef struct
     u8 type;
     u8 state;
     LCDCallBack cb;
-
-}LCD_Request_t;
-
-/* Stores the string to be printed information */
-typedef struct
-{
     const u8 * data;
     u8 length;
     u8 currIndex;
-}LCD_WriteRequest_t;
-
-/* Cursor position */
-typedef struct
-{
     u8 row;
     u8 col;
-}LCD_Pos_t;
+}LCD_Request_t;
+
+
 
 /* States of the LCD */
 typedef enum {LCD_OFF, LCD_INIT, LCD_OPERATION}LCD_State_t;
@@ -152,14 +144,12 @@ extern const LCD_Pin_t LCD_Pins[LCD_PINS_NUM];
 
 static LCD_State_t G_LCDState = LCD_OFF;        /* States of LCD */
 
-static LCD_Request_t G_Request;                 
-static LCD_WriteRequest_t G_WriteReq;         /* Info of the string request */
-static LCD_Pos_t G_Pos;
-
+static LCD_Request_t Requests[REQUEST_BUFFER_SIZE];     /* Buffer of requests */
+static u8 currReqIdx;
 
 static u8 G_OperationLatchCount;       /* counter used by operation requests to check if number of latches required is reached */
 
-static u8 G_CharCount;              /* Number of characters written on the LCD */
+
 
 /* ============================================================================ */
 /*                                  STATIC FUNCTIONS                           	*/
@@ -396,126 +386,54 @@ static void InitProcess(void)
 #endif
 
 
-
-
-/* static void WriteString(void)
-{
-    static u8 posLatchCount = 0;
-    static u8 changeRow = 0;
-
-    if(G_WriteReq.string[G_WriteReq.currIndex] != '\0')
-    {
-
-        if(G_CharCount == 16 && changeRow == 0)
-        {
-            G_Pos.col = 0;
-            G_Pos.row = 1;
-
-            changeRow = 1;
-             
-        }
-        else if(G_CharCount == 32 && changeRow == 0)
-        {
-            G_Pos.col = 0;
-            G_Pos.row = 0;  
-
-            changeRow = 1;
-        }
-        else if(changeRow == 1 && G_CharCount == 16)
-        {
-            posLatchCount++;
-            if(posLatchCount == LATCH_TARGET_COUNT)
-            {
-                posLatchCount = 0;
-                changeRow = 0;
-            }
-            WriteCommand(LCD_SET_DDR_ADDRESS); 
-        }
-        else if(changeRow == 1 && G_CharCount == 32)
-        {
-            posLatchCount++;
-            if(posLatchCount == LATCH_TARGET_COUNT)
-            {
-                posLatchCount = 0;
-                changeRow = 0;
-                G_CharCount = 0;
-            }
-            WriteCommand(LCD_SET_DDR_ADDRESS + 0x40);
-        }
-        else
-        {
-            WriteData(G_WriteReq.string[G_WriteReq.currIndex]);
-            G_OperationLatchCount++;
-
-            if(G_OperationLatchCount == LATCH_TARGET_COUNT)
-            {
-                G_WriteReq.currIndex++;
-                G_OperationLatchCount = 0;
-
-                G_CharCount++;
-            }
-        }
-        
-    }
-    else
-    {
-        G_Request.state = AVAILABLE;
-        G_Request.type = NONE;
-
-        // G_WriteReq.currIndex = 0;  //---------------------->>>
-        // G_StringReq.string = NULL;  //---------------------->>>
-    }
-} */
-
-
 /* Iterates through the string and prints each character */
 static void WriteString(void)
 {
 
-    if(G_WriteReq.data[G_WriteReq.currIndex] != '\0')
+    if(Requests[currReqIdx].data[Requests[currReqIdx].currIndex] != '\0')
     {
-        WriteData(G_WriteReq.data[G_WriteReq.currIndex]);
+        WriteData(Requests[currReqIdx].data[Requests[currReqIdx].currIndex]);
         G_OperationLatchCount++;
 
         if(G_OperationLatchCount == LATCH_TARGET_COUNT)
         {
-            G_WriteReq.currIndex++;
+            Requests[currReqIdx].currIndex++;
             G_OperationLatchCount = 0;
 
-            G_CharCount++;
         }     
     }
     else
     {
-        G_Request.state = AVAILABLE;
-        G_Request.type = NONE;
+        Requests[currReqIdx].state = AVAILABLE;
+        Requests[currReqIdx].type = NONE;
 
     }
 }
+
 
 static void WriteBuffer(void)
 {
 
-    if(G_WriteReq.currIndex < G_WriteReq.length)
+    if(Requests[currReqIdx].currIndex < Requests[currReqIdx].length)
     {
-        WriteData(G_WriteReq.data[G_WriteReq.currIndex]);
+        WriteData(Requests[currReqIdx].data[Requests[currReqIdx].currIndex]);
         G_OperationLatchCount++;
 
         if(G_OperationLatchCount == LATCH_TARGET_COUNT)
         {
-            G_WriteReq.currIndex++;
+            Requests[currReqIdx].currIndex++;
             G_OperationLatchCount = 0;
 
-            G_CharCount++;
         }     
     }
     else
     {
-        G_Request.state = AVAILABLE;
-        G_Request.type = NONE;
+        Requests[currReqIdx].state = AVAILABLE;
+        Requests[currReqIdx].type = NONE;
 
     }
 }
+
 
 static void ClearScreen(void)
 {
@@ -523,8 +441,8 @@ static void ClearScreen(void)
     {
         G_OperationLatchCount = 0;
 
-        G_Request.state = AVAILABLE;
-        G_Request.type = NONE;
+        Requests[currReqIdx].state = AVAILABLE;
+        Requests[currReqIdx].type = NONE;
     }
     else
     {
@@ -541,18 +459,18 @@ static void SetCursorPos(void)
     {
         G_OperationLatchCount = 0;
 
-        G_Request.state = AVAILABLE;
-        G_Request.type = NONE;
+        Requests[currReqIdx].state = AVAILABLE;
+        Requests[currReqIdx].type = NONE;
     }
     else
     {
-        if(G_Pos.row == 0)
+        if(Requests[currReqIdx].row == 0)
         {
-            WriteCommand(LCD_SET_DDR_ADDRESS + G_Pos.col);
+            WriteCommand(LCD_SET_DDR_ADDRESS + Requests[currReqIdx].col);
         }
-        else if (G_Pos.row == 1)
+        else if (Requests[currReqIdx].row == 1)
         {
-            WriteCommand(LCD_SET_DDR_ADDRESS + (G_Pos.col + 0x40) );
+            WriteCommand(LCD_SET_DDR_ADDRESS + (Requests[currReqIdx].col + 0x40) );
         }
 
         G_OperationLatchCount++;
@@ -563,24 +481,45 @@ static void SetCursorPos(void)
 
 
 /* If the LCD finished Initialization and is in Operation mode */
+
 static void OperationProcess(void)
 {
-    if(G_Request.type == WRITE_STRING)
+    if(Requests[currReqIdx].state == BUSY)
     {
-        WriteString();
+        if(Requests[currReqIdx].type == WRITE_STRING)
+        {
+            WriteString();
+        }
+        else if(Requests[currReqIdx].type == WRITE_BUFFER)
+        {
+            WriteBuffer();
+        }
+        else if(Requests[currReqIdx].type == CLEAR_SCREEN)
+        {
+            ClearScreen();
+        }
+        else if(Requests[currReqIdx].type == SET_CURSOR_POS)
+        {
+            SetCursorPos();
+        }
     }
-    else if(G_Request.type == WRITE_BUFFER)
+    else
     {
-        WriteBuffer();
+		currReqIdx++;
+
+		if(currReqIdx == REQUEST_BUFFER_SIZE)
+		{
+			currReqIdx = 0;
+		}
+
+        /* if no request after the previous request that means there are no more
+        buffered requests so reset the index back to 0 */
+		if(Requests[currReqIdx].state == AVAILABLE)
+		{
+			currReqIdx = 0;
+		}
     }
-    else if(G_Request.type == CLEAR_SCREEN)
-    {
-        ClearScreen();
-    }
-    else if(G_Request.type == SET_CURSOR_POS)
-    {
-        SetCursorPos();
-    }
+
 }
 
 /* ============================================================================ */
@@ -642,32 +581,39 @@ LCD_ErrorStatus_t LCD_Init(void)
     return Ret_ErrorStatus;
 }
 
+
 LCD_ErrorStatus_t LCD_WriteStringAsync(const u8 * string)
 {
     LCD_ErrorStatus_t Ret_ErrorStatus = LCD_OK;
-
+    u8 iter;
     if(string == NULL)
     {
         Ret_ErrorStatus = LCD_NOK;
     }
     else
     {
-        if(G_Request.state == AVAILABLE)
+        for(iter = 0; iter < REQUEST_BUFFER_SIZE; iter++)
         {
-            G_Request.state = BUSY;
-            G_Request.type = WRITE_STRING;
-
-            G_WriteReq.data = string;
-            G_WriteReq.currIndex = 0;
+            if(Requests[iter].state == AVAILABLE)
+            {
+              Requests[iter].state = BUSY;
+              Requests[iter].type = WRITE_STRING;
+              Requests[iter].data = string;
+              Requests[iter].currIndex = 0;
+              break;
+            }
         }
     }
 
     return Ret_ErrorStatus;
 }
 
+
 LCD_ErrorStatus_t LCD_WriteBufferAsync(const u8 * data, u16 size)
 {
     LCD_ErrorStatus_t Ret_ErrorStatus = LCD_OK;
+
+    u8 iter;
 
     if(data == NULL)
     {
@@ -675,26 +621,37 @@ LCD_ErrorStatus_t LCD_WriteBufferAsync(const u8 * data, u16 size)
     }
     else
     {
-        if(G_Request.state == AVAILABLE)
+        for(iter = 0; iter < REQUEST_BUFFER_SIZE; iter++)
         {
-            G_Request.state = BUSY;
-            G_Request.type = WRITE_BUFFER;
+            if(Requests[iter].state == AVAILABLE)
+            {
+              Requests[iter].state = BUSY;
+              Requests[iter].type = WRITE_BUFFER;
 
-            G_WriteReq.data = data;
-            G_WriteReq.length = size;
-            G_WriteReq.currIndex = 0;
+              Requests[iter].data = data;
+              Requests[iter].length = size;
+              Requests[iter].currIndex = 0;
+              break;
+            }
         }
     }
 
     return Ret_ErrorStatus;
 }
 
+
 LCD_ErrorStatus_t LCD_ClearScreenAsync(void)
 {
-    if(G_Request.state == AVAILABLE)
+    u8 iter;
+
+    for(iter = 0; iter < REQUEST_BUFFER_SIZE; iter++)
     {
-        G_Request.state = BUSY;
-        G_Request.type = CLEAR_SCREEN;
+        if(Requests[iter].state == AVAILABLE)
+        {
+            Requests[iter].state = BUSY;
+            Requests[iter].type = CLEAR_SCREEN;
+            break;
+        }
     }
     
     return 0;
@@ -703,23 +660,20 @@ LCD_ErrorStatus_t LCD_ClearScreenAsync(void)
 
 LCD_ErrorStatus_t LCD_SetCursorPosAsync(u8 row, u8 col)
 {
-    if(G_Request.state == AVAILABLE)
+    u8 iter;
+
+    for(iter = 0; iter < REQUEST_BUFFER_SIZE; iter++)
     {
-        G_Request.state = BUSY;
-        G_Request.type = SET_CURSOR_POS;
-
-        G_Pos.row = row;
-        G_Pos.col = col;
-
-        if(G_Pos.row == 0)
+        if(Requests[iter].state == AVAILABLE)
         {
-            G_CharCount = G_Pos.col;
-        }
-        else if(G_Pos.row == 1)
-        {
-           G_CharCount = G_Pos.col+16; 
-        }
+            Requests[iter].state = BUSY;
+            Requests[iter].type = SET_CURSOR_POS;
 
+            Requests[iter].row = row;
+            Requests[iter].col = col;
+
+            break;
+        }
     }
 
     return 0;
