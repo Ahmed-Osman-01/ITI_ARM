@@ -82,6 +82,7 @@ typedef struct
     u8 currIndex;
     u8 row;
     u8 col;
+    u8 command;
 }LCD_Request_t;
 
 
@@ -128,6 +129,7 @@ typedef enum
     WRITE_BUFFER,
     CLEAR_SCREEN,
     SET_CURSOR_POS,
+    SEND_COMMAND,
 }LCD_RequestTypes_t;
 
 /* ============================================================================ */
@@ -479,6 +481,22 @@ static void SetCursorPos(void)
 
 }
 
+static void SendCommand(void)
+{
+    if(G_OperationLatchCount == LATCH_TARGET_COUNT)
+    {
+        G_OperationLatchCount = 0;
+
+        Requests[currReqIdx].state = AVAILABLE;
+        Requests[currReqIdx].type = NONE;
+    }
+    else
+    {  
+        WriteCommand(Requests[currReqIdx].command);
+        G_OperationLatchCount++;
+    }
+}
+
 
 /* If the LCD finished Initialization and is in Operation mode */
 
@@ -502,6 +520,10 @@ static void OperationProcess(void)
         {
             SetCursorPos();
         }
+        else if(Requests[currReqIdx].type == SEND_COMMAND)
+        {
+            SendCommand();
+        }
     }
     else
     {
@@ -519,7 +541,6 @@ static void OperationProcess(void)
 			currReqIdx = 0;
 		}
     }
-
 }
 
 /* ============================================================================ */
@@ -677,4 +698,21 @@ LCD_ErrorStatus_t LCD_SetCursorPosAsync(u8 row, u8 col)
     }
 
     return 0;
+}
+
+
+LCD_ErrorStatus_t LCD_SendCommandAsync(u8 command)
+{
+     u8 iter;
+
+    for(iter = 0; iter < REQUEST_BUFFER_SIZE; iter++)
+    {
+        if(Requests[iter].state == AVAILABLE)
+        {
+            Requests[iter].state = BUSY;
+            Requests[iter].type = SEND_COMMAND;
+            Requests[iter].command = command;
+            break;
+        }
+    }
 }
