@@ -1,0 +1,7 @@
+../Src/COMM/LIN_SLAVE/LIN_Slave.c:41:6:LIN_SlaveInit	80	static
+../Src/COMM/LIN_SLAVE/LIN_Slave.c:87:13:BreakCallback	8	static
+../Src/COMM/LIN_SLAVE/LIN_Slave.c:92:13:SlaveTask	16	static
+../Src/COMM/LIN_SLAVE/LIN_Slave.c:144:13:SendData	16	static
+../Src/COMM/LIN_SLAVE/LIN_Slave.c:162:13:ReceiveData	16	static
+../Src/COMM/LIN_SLAVE/LIN_Slave.c:185:4:CalculatePid	32	static
+../Src/COMM/LIN_SLAVE/LIN_Slave.c:210:11:Calculate_Checksum	24	static

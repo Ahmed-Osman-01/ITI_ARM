@@ -19,7 +19,8 @@ RM := rm -rf
 -include Src/HAL/SWITCH/subdir.mk
 -include Src/HAL/LED/subdir.mk
 -include Src/HAL/LCD/subdir.mk
--include Src/COMM/LIN/subdir.mk
+-include Src/COMM/LIN_SLAVE/subdir.mk
+-include Src/COMM/LIN_MASTER/subdir.mk
 -include Src/APP/TrafficLights/subdir.mk
 -include Src/APP/TEST/subdir.mk
 -include objects.mk
@@ -62,6 +63,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 stm32f401Drivers.list \
 
+OBJCOPY_HEX += \
+stm32f401Drivers.hex \
+
 
 # All Target
 all: main-build
@@ -85,12 +89,17 @@ stm32f401Drivers.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS
 	@echo 'Finished building: $@'
 	@echo ' '
 
+stm32f401Drivers.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "stm32f401Drivers.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) default.size.stdout stm32f401Drivers.elf stm32f401Drivers.list stm32f401Drivers.map
+	-$(RM) default.size.stdout stm32f401Drivers.elf stm32f401Drivers.hex stm32f401Drivers.list stm32f401Drivers.map
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

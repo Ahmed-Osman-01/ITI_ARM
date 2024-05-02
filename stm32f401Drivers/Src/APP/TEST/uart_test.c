@@ -48,6 +48,7 @@ int main(void)
     RCC_EnablePeripheral(RCC_USART6);
 
     NVIC_EnableInterrupt(NVIC_USART2);
+    NVIC_EnableInterrupt(NVIC_USART1);
 
     GPIO_Pin_t uart2TX;
     GPIO_Pin_t uart2RX;
@@ -92,28 +93,32 @@ void lcdApp(void)
 {
 //	UART_TXByte(UART2, 'A');
 
-	UART_TXBufferAsyncZC(UART2, "Ahmed\n\r", 7, fun);
+//	UART_TXBufferAsyncZC(UART2, "Ahmed\n\r", 7, fun);
+	LCD_WriteStringAsync("AHMED");
 
 }
 
 void uartApp(void)
 {
-	u8 input = 0;
+//	u8 input = 0;
+//
+//
+//	UART_RXByte(UART2, &input);
+//
+//	if(input == '0')
+//	{
+//		LED_SetState(LED_ONE, LED_STATE_OFF);
+//		LCD_ClearScreenAsync();
+//
+//	}
+//	else if(input == '1')
+//	{
+//		LED_SetState(LED_ONE, LED_STATE_ON);
+//		UART_RXBufferAsyncZC(UART2, buffer, 7, rxCB);
+//	}
 
 
-	UART_RXByte(UART2, &input);
-
-	if(input == '0')
-	{
-		LED_SetState(LED_ONE, LED_STATE_OFF);
-		LCD_ClearScreenAsync();
-
-	}
-	else if(input == '1')
-	{
-		LED_SetState(LED_ONE, LED_STATE_ON);
-		UART_RXBufferAsyncZC(UART2, buffer, 7, rxCB);
-	}
+	LCD_WriteStringAsync("AHMED");
 }
 
 #endif

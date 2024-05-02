@@ -1,0 +1,2 @@
+../Src/COMM/LIN_SLAVE/LIN_SlaveAppData.c:13:6:SlaveSendControls	16	static
+../Src/COMM/LIN_SLAVE/LIN_SlaveAppData.c:20:6:SlaveGetControls	16	static

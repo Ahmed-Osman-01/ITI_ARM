@@ -6,6 +6,9 @@
  */
 
 
+
+#if 0
+
 #include "LIB/STD_TYPES.h"
 #include "MCAL/RCC/RCC.h"
 #include "MCAL/UART/UART.h"
@@ -13,7 +16,11 @@
 #include "MCAL/GPIO/GPIO.h"
 #include "SERVICE/SCHED/SCHED.h"
 
-#include "COMM/LIN/LIN_HW.h"
+#include "COMM/LIN_SLAVE/LIN_SlaveAppData.h"
+#include "COMM/LIN_MASTER/LIN_MasterAppData.h"
+
+#include "COMM/LIN_MASTER/LIN_Master.h"
+#include "COMM/LIN_SLAVE/LIN_SLave.h"
 
 #include "HAL/LCD/LCD.h"
 #include "HAL/LED/LED.h"
@@ -28,14 +35,7 @@ void fun(void)
 
 }
 
-void lbd(void)
-{
-	static u8 state = GPIO_STATE_HIGH;
 
-
-	GPIO_SetPinState(GPIO_PORT_B, GPIO_PIN_1, state);
-	state = !state;
-}
 
 void rxCB(void)
 {
@@ -56,6 +56,7 @@ int main(void)
     RCC_EnablePeripheral(RCC_USART6);
 
     NVIC_EnableInterrupt(NVIC_USART2);
+    NVIC_EnableInterrupt(NVIC_USART1);
 
 
 
@@ -68,25 +69,30 @@ int main(void)
 	ledPin.Speed = GPIO_SPEED_HIGH;
 	GPIO_Init(&ledPin);
 
-	LIN_HW_Init();
 
+	LIN_MasterInit();
+	LIN_SlaveInit();
 
-    LCD_Init();
+//    LCD_Init();
     LED_Init();
 
-    UART_LIN_Config_t linConfig;
-    linConfig.State = UART_LIN_ENABLED;
-    linConfig.BreakDetectLength = UART_LIN_BREAK_DETECTION_11;
-    linConfig.BreakDetectInterrupt = UART_LIN_BREAK_INTERRUPT_ENABLED;
-
-    UART_ConfigLIN(UART2, &linConfig);
-
-
-    UART_SetLBDCallback(UART2, lbd);
-
-//    UART_TXLINBreak(UART2);
 
     blinkingLed_Init();
+
+//    UART_SendBreak(UART1);
+//    UART_SendBreak(UART2);
+
+
+       u16 masterGetData;
+       u16 masterSendData = 0x0807;
+       MasterGetControls(&masterGetData);
+       MasterSendControls(masterSendData);
+
+
+       u16 slaveGetData;
+       u16 slaveSendData =0x0201;
+       SlaveGetControls(&slaveGetData);
+       SlaveSendControls(slaveSendData);
 
     SCHED_Init();
     SCHED_Start();
@@ -101,7 +107,20 @@ void lcdApp(void)
 
 //	UART_TXBufferAsyncZC(UART2, "Ahmed\n\r", 7, fun);
 
-	UART_TXLINBreak(UART2);
+//	UART_SendBreak(UART2);
+
+
+//    u16 masterGetData;
+//    u16 masterSendData = 0x0807;
+//    MasterGetControls(&masterGetData);
+//    MasterSendControls(masterSendData);
+//
+//
+//    u16 slaveGetData;
+//    u16 slaveSendData =0x0201;
+//    SlaveGetControls(&slaveGetData);
+//    SlaveSendControls(slaveSendData);
+
 
 }
 
@@ -124,3 +143,6 @@ void uartApp(void)
 //		UART_RXBufferAsyncZC(UART2, buffer, 7, rxCB);
 //	}
 }
+
+
+#endif

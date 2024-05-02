@@ -12,7 +12,7 @@ typedef enum
 {
 
 	BLINKING_LED,
-	LED_ONE,
+//	LED_ONE,
 //    LED_TWO,
 //    RED_LED,
 //    GREEN_LED,

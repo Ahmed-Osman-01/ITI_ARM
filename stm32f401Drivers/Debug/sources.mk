@@ -10,6 +10,7 @@ C_SRCS :=
 S_UPPER_SRCS := 
 O_SRCS := 
 CYCLO_FILES := 
+OBJCOPY_HEX := 
 SIZE_OUTPUT := 
 OBJDUMP_LIST := 
 SU_FILES := 
@@ -24,7 +25,8 @@ C_DEPS :=
 SUBDIRS := \
 Src/APP/TEST \
 Src/APP/TrafficLights \
-Src/COMM/LIN \
+Src/COMM/LIN_MASTER \
+Src/COMM/LIN_SLAVE \
 Src/HAL/LCD \
 Src/HAL/LED \
 Src/HAL/SWITCH \
