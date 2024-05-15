@@ -1,9 +1,0 @@
-../Src/COMM/LIN_MASTER/LIN_Master.c:37:6:LIN_MasterGetData	24	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:47:6:LIN_MasterSendData	24	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:57:13:sendHeader	16	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:71:6:SendData	16	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:91:13:ReceiveData	16	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:115:6:LIN_MasterInit	80	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:162:6:LIN_MasterTask	8	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:187:13:LIN_SlaveTask	16	static
-../Src/COMM/LIN_MASTER/LIN_Master.c:220:11:Calculate_Checksum	24	static

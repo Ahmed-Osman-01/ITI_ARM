@@ -14,7 +14,6 @@ typedef enum
 {
     LCD,
     BLINKING_LED,
-//	LIN_MASTER,
     LCD_APP,
 	LCD_CLEAR,
 

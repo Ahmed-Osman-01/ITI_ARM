@@ -1,0 +1,74 @@
+/*
+ * uart_test.c
+ *
+ *  Created on: Mar 27, 2024
+ *      Author: Osman
+ */
+
+
+#if 1
+
+
+#include "LIB/STD_TYPES.h"
+#include "MCAL/RCC/RCC.h"
+#include "MCAL/NVIC/NVIC.h"
+#include "MCAL/GPIO/GPIO.h"
+
+#include "SERVICE/FreeRTOS/FreeRTOS.h"
+#include "SERVICE/FreeRTOS/task.h"
+
+#include "HAL/LED/LED.h"
+
+
+void vTaskCode( void * pvParameters )
+{
+
+	configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+	u8 state = LED_STATE_OFF;
+
+
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	const TickType_t xFrequency = pdMS_TO_TICKS(1000);
+
+	for (;;) {
+	    // Perform task operation
+	    vTaskDelayUntil(&xLastWakeTime, xFrequency); // Wait until next 1000 milliseconds
+		LED_SetState(BLINKING_LED, state);
+		state = !state;
+	}
+
+
+}
+
+int main(void)
+{
+
+    RCC_EnableClk(RCC_CLK_HSE);
+    RCC_SetSystemClk(RCC_SYSCLK_HSE);
+
+    RCC_EnablePeripheral(RCC_GPIOA);
+    RCC_EnablePeripheral(RCC_GPIOC);
+
+
+    LED_Init();
+
+    xTaskCreate(vTaskCode,             // Task function
+                   "PeriodicTask",            // Task name (for debugging)
+                   configMINIMAL_STACK_SIZE, // Stack depth
+                   (void*)1,                     // Task parameters (not used here)
+                   tskIDLE_PRIORITY + 1,     // Priority
+                   NULL);
+
+
+    vTaskStartScheduler();
+
+    while(1)
+    {
+
+    }
+
+    return 0;
+}
+
+
+#endif

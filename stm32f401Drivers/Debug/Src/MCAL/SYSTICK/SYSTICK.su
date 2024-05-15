@@ -4,4 +4,3 @@
 ../Src/MCAL/SYSTICK/SYSTICK.c:141:23:SYSTICK_Start	24	static
 ../Src/MCAL/SYSTICK/SYSTICK.c:169:6:SYSTICK_IsExpired	4	static
 ../Src/MCAL/SYSTICK/SYSTICK.c:179:23:SYSTICK_SetCallback	24	static
-../Src/MCAL/SYSTICK/SYSTICK.c:197:6:SysTick_Handler	8	static

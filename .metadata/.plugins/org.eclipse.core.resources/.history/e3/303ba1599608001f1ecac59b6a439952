@@ -1,0 +1,57 @@
+/*
+ * uart_test.c
+ *
+ *  Created on: Mar 27, 2024
+ *      Author: Osman
+ */
+
+
+#if 1
+
+
+#include "LIB/STD_TYPES.h"
+#include "MCAL/RCC/RCC.h"
+#include "MCAL/NVIC/NVIC.h"
+#include "MCAL/GPIO/GPIO.h"
+
+#include "SERVICE/FreeRTOS/FreeRTOS.h"
+#include "SERVICE/FreeRTOS/task.h"
+
+#include "HAL/LED/LED.h"
+
+
+void vTaskCode( void * pvParameters )
+{
+
+	configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+	u8 state = LED_STATE_OFF;
+
+
+	while(1)
+	{
+		LED_SetState(Copy_LedID, Copy_State)
+	}
+}
+
+int main(void)
+{
+
+    RCC_EnableClk(RCC_CLK_HSE);
+    RCC_SetSystemClk(RCC_SYSCLK_HSE);
+
+    RCC_EnablePeripheral(RCC_GPIOA);
+    RCC_EnablePeripheral(RCC_GPIOB);
+
+
+    LED_Init();
+
+
+
+
+
+
+    return 0;
+}
+
+
+#endif

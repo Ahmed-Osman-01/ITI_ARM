@@ -31,6 +31,10 @@
 #define READY   0U
 #define BUSY    1U
 
+#define UART1_INDEX     0
+#define UART2_INDEX     1
+#define UART6_INDEX     2
+
 
 /* ------------------------------------- */
 /*                  MASKS                */
@@ -265,7 +269,7 @@ UART_ErrorStatus_t UART_TXBufferAsyncZC(u8 UARTx, u8 * buffer, u16 length, UART_
     {
         Ret_ErrorStatus = UART_INVALID_UART;
     }
-    else if(buffer == NULL)
+    else if(buffer == NULL || cb == NULL)
     {
         Ret_ErrorStatus = UART_NULL_PTR;
     }
@@ -351,7 +355,7 @@ UART_ErrorStatus_t UART_RXBufferAsyncZC(u8 UARTx, u8 * buffer, u16 length, UART_
     {
         Ret_ErrorStatus = UART_INVALID_UART;
     }
-    else if(buffer == NULL)
+    else if(buffer == NULL || cb == NULL)
     {
         Ret_ErrorStatus = UART_NULL_PTR;
     }
@@ -425,7 +429,7 @@ UART_ErrorStatus_t UART_ConfigLIN(u8 UARTx, UART_LIN_Config_t* Config)
 
 
 
-UART_ErrorStatus_t UART_SendBreak(u8 UARTx)
+UART_ErrorStatus_t UART_TXLINBreak(u8 UARTx)
 {
     UART_ErrorStatus_t Ret_ErrorStatus = UART_OK;
 
@@ -480,71 +484,60 @@ UART_ErrorStatus_t UART_SetLBDCallback(u8 UARTx, UART_LBDCallback_t cb)
 
 void USART1_IRQHandler(void)
 {
-     /* NOTE: If a break is detected and interrupt happens, the TXE flag may be risen so
+    /* NOTE: If a break is detected and interrupt happens, the TXE flag may be risen so
         i choose to check for either the LIN break detection interrupt or the TXE and RXNE interrupt
         becuase if i don't, everytime LBD interrupt happens the TXE will be handled if its flag is set
         which will cause problems */
-	if(UARTs[UART1]->SR & UART_LBD_MASK)
-	{
-		/* Clear LBD Flag */
-		UARTs[UART1]->SR &= ~UART_LBD_MASK;
+    if(UARTs[UART1]->SR & UART_LBD_MASK)
+    {
+        /* Clear LBD Flag */
+        UARTs[UART1]->SR &= ~UART_LBD_MASK;
 
-		/* Call LBD Interrupt CB function if not NULL*/
-		if(LBDCallbacks[UART1])
-		{
-			LBDCallbacks[UART1]();
-		}
+        /* Call LBD Interrupt CB function if not NULL*/
+        if(LBDCallbacks[UART1])
+        {
+            LBDCallbacks[UART1]();
+        }
+        
+    }
+    else
+    {
+        if(UARTs[UART1]->SR & UART_TXE_MASK)
+        {
+            if(TXRequests[UART1_INDEX].Buffer.CurrIdx < TXRequests[UART1_INDEX].Buffer.Length)
+            {
+                UARTs[UART1]->DR = TXRequests[UART1_INDEX].Buffer.Data[TXRequests[UART1_INDEX].Buffer.CurrIdx];
+                TXRequests[UART1_INDEX].Buffer.CurrIdx++;
+            }
+            else
+            {
+                TXRequests[UART1_INDEX].State = READY;
+                /* DISABLE TXE interrupt */
+                UARTs[UART1]->CR1 &= ~UART_TXEIE_MASK;
 
-	}
+                TXRequests[UART1_INDEX].Cb();
+            }
+        }
 
-	if(UARTs[UART1]->SR & UART_TXE_MASK)
-	{
-		if(TXRequests[UART1].State == BUSY)
-		{
-			if(TXRequests[UART1].Buffer.CurrIdx < TXRequests[UART1].Buffer.Length)
-			{
-				UARTs[UART1]->DR = TXRequests[UART1].Buffer.Data[TXRequests[UART1].Buffer.CurrIdx];
-				TXRequests[UART1].Buffer.CurrIdx++;
-			}
-			else
-			{
-				TXRequests[UART1].State = READY;
-				/* DISABLE TXE interrupt */
-				UARTs[UART1]->CR1 &= ~UART_TXEIE_MASK;
+        if(UARTs[UART1]->SR & UART_RXNE_MASK)
+        {
+            if(RXRequests[UART1_INDEX].Buffer.CurrIdx < RXRequests[UART1_INDEX].Buffer.Length)
+            {
+                RXRequests[UART1_INDEX].Buffer.Data[RXRequests[UART1_INDEX].Buffer.CurrIdx] = UARTs[UART1]->DR;
+                RXRequests[UART1_INDEX].Buffer.CurrIdx++;
 
-                if(TXRequests[UART1].Cb)
+                if(RXRequests[UART1_INDEX].Buffer.CurrIdx == RXRequests[UART1_INDEX].Buffer.Length)
                 {
-				    TXRequests[UART1].Cb();
+                    RXRequests[UART1_INDEX].State = READY;
+                    /* DISABLE RXE interrupt */
+                    UARTs[UART1]->CR1 &= ~UART_RXNEIE_MASK;
+
+                    RXRequests[UART1_INDEX].Cb();
                 }
-			}
-		}
 
-	}
-
-	if(UARTs[UART1]->SR & UART_RXNE_MASK)
-	{
-		if(RXRequests[UART1].State == BUSY)
-		{
-			if(RXRequests[UART1].Buffer.CurrIdx < RXRequests[UART1].Buffer.Length)
-			{
-				RXRequests[UART1].Buffer.Data[RXRequests[UART1].Buffer.CurrIdx] = UARTs[UART1]->DR;
-				RXRequests[UART1].Buffer.CurrIdx++;
-
-				if(RXRequests[UART1].Buffer.CurrIdx == RXRequests[UART1].Buffer.Length)
-				{
-					RXRequests[UART1].State = READY;
-					/* DISABLE RXE interrupt */
-					UARTs[UART1]->CR1 &= ~UART_RXNEIE_MASK;
-
-                    if(RXRequests[UART1].Cb)
-                    {
-                        RXRequests[UART1].Cb();
-                    }
-				}
-
-			}
-		}
-	}
+            }    
+        }
+    }    
 } 
 
 
@@ -566,56 +559,44 @@ void USART2_IRQHandler(void)
 		}
 
 	}
-
-	if(UARTs[UART2]->SR & UART_TXE_MASK)
+	else
 	{
-		if(TXRequests[UART2].State == BUSY)
-		{
-			if(TXRequests[UART2].Buffer.CurrIdx < TXRequests[UART2].Buffer.Length)
-			{
-				UARTs[UART2]->DR = TXRequests[UART2].Buffer.Data[TXRequests[UART2].Buffer.CurrIdx];
-				TXRequests[UART2].Buffer.CurrIdx++;
-			}
-			else
-			{
-				TXRequests[UART2].State = READY;
-				/* DISABLE TXE interrupt */
-				UARTs[UART2]->CR1 &= ~UART_TXEIE_MASK;
+	    if(UARTs[UART2]->SR & UART_TXE_MASK)
+	    {
+	        if(TXRequests[UART2_INDEX].Buffer.CurrIdx < TXRequests[UART2_INDEX].Buffer.Length)
+	        {
+	            UARTs[UART2]->DR = TXRequests[UART2_INDEX].Buffer.Data[TXRequests[UART2_INDEX].Buffer.CurrIdx];
+	            TXRequests[UART2_INDEX].Buffer.CurrIdx++;
+	        }
+	        else
+	        {
+	            TXRequests[UART2_INDEX].State = READY;
+	            /* DISABLE TXE interrupt */
+	            UARTs[UART2]->CR1 &= ~UART_TXEIE_MASK;
 
-                if(TXRequests[UART2].Cb)
-                {
-				    TXRequests[UART2].Cb();
-                }
-			}
-		}
+	            TXRequests[UART2_INDEX].Cb();
+	        }
+	    }
 
+	    if(UARTs[UART2]->SR & UART_RXNE_MASK)
+	    {
+	        if(RXRequests[UART2_INDEX].Buffer.CurrIdx < RXRequests[UART2_INDEX].Buffer.Length)
+	        {
+	            RXRequests[UART2_INDEX].Buffer.Data[RXRequests[UART2_INDEX].Buffer.CurrIdx] = UARTs[UART2]->DR;
+	            RXRequests[UART2_INDEX].Buffer.CurrIdx++;
+
+	            if(RXRequests[UART2_INDEX].Buffer.CurrIdx == RXRequests[UART2_INDEX].Buffer.Length)
+	            {
+	                RXRequests[UART2_INDEX].State = READY;
+	                /* DISABLE RXE interrupt */
+	                UARTs[UART2]->CR1 &= ~UART_RXNEIE_MASK;
+
+	                RXRequests[UART2_INDEX].Cb();
+	            }
+
+	        }
+	    }
 	}
-
-	if(UARTs[UART2]->SR & UART_RXNE_MASK)
-	{
-		if(RXRequests[UART2].State == BUSY)
-		{
-			if(RXRequests[UART2].Buffer.CurrIdx < RXRequests[UART2].Buffer.Length)
-			{
-				RXRequests[UART2].Buffer.Data[RXRequests[UART2].Buffer.CurrIdx] = UARTs[UART2]->DR;
-				RXRequests[UART2].Buffer.CurrIdx++;
-
-				if(RXRequests[UART2].Buffer.CurrIdx == RXRequests[UART2].Buffer.Length)
-				{
-					RXRequests[UART2].State = READY;
-					/* DISABLE RXE interrupt */
-					UARTs[UART2]->CR1 &= ~UART_RXNEIE_MASK;
-
-                    if(RXRequests[UART2].Cb)
-                    {
-                        RXRequests[UART2].Cb();
-                    }
-				}
-
-			}
-		}
-	}
-
 } 
 
 
@@ -625,6 +606,7 @@ void USART6_IRQHandler(void)
         i choose to check for either the LIN break detection interrupt or the TXE and RXNE interrupt
         becuase if i don't, everytime LBD interrupt happens the TXE will be handled if its flag is set
         which will cause problems */
+
     if(UARTs[UART6]->SR & UART_LBD_MASK)
     {
         /* Clear LBD Flag */
@@ -637,55 +619,45 @@ void USART6_IRQHandler(void)
         }
 
     }
-
-    if(UARTs[UART6]->SR & UART_TXE_MASK)
+    else
     {
-        if(TXRequests[UART6].State == BUSY)
+        if(UARTs[UART6]->SR & UART_TXE_MASK)
         {
-            if(TXRequests[UART6].Buffer.CurrIdx < TXRequests[UART6].Buffer.Length)
+            if(TXRequests[UART6_INDEX].Buffer.CurrIdx < TXRequests[UART6_INDEX].Buffer.Length)
             {
-                UARTs[UART6]->DR = TXRequests[UART6].Buffer.Data[TXRequests[UART6].Buffer.CurrIdx];
-                TXRequests[UART6].Buffer.CurrIdx++;
+                UARTs[UART6]->DR = TXRequests[UART6_INDEX].Buffer.Data[TXRequests[UART6_INDEX].Buffer.CurrIdx];
+                TXRequests[UART6_INDEX].Buffer.CurrIdx++;
             }
             else
             {
-                TXRequests[UART6].State = READY;
+                TXRequests[UART6_INDEX].State = READY;
                 /* DISABLE TXE interrupt */
                 UARTs[UART6]->CR1 &= ~UART_TXEIE_MASK;
 
-                if(TXRequests[UART6].Cb)
-                {
-				    TXRequests[UART6].Cb();
-                }
+                TXRequests[UART6_INDEX].Cb();
             }
         }
 
-    }
-
-    if(UARTs[UART6]->SR & UART_RXNE_MASK)
-    {
-        if(RXRequests[UART6].State == BUSY)
+        if(UARTs[UART6]->SR & UART_RXNE_MASK)
         {
-            if(RXRequests[UART6].Buffer.CurrIdx < RXRequests[UART6].Buffer.Length)
+            if(RXRequests[UART6_INDEX].Buffer.CurrIdx < RXRequests[UART6_INDEX].Buffer.Length)
             {
-                RXRequests[UART6].Buffer.Data[RXRequests[UART6].Buffer.CurrIdx] = UARTs[UART6]->DR;
-                RXRequests[UART6].Buffer.CurrIdx++;
+                RXRequests[UART6_INDEX].Buffer.Data[RXRequests[UART6_INDEX].Buffer.CurrIdx] = UARTs[UART6]->DR;
+                RXRequests[UART6_INDEX].Buffer.CurrIdx++;
 
-                if(RXRequests[UART6].Buffer.CurrIdx == RXRequests[UART6].Buffer.Length)
+                if(RXRequests[UART6_INDEX].Buffer.CurrIdx == RXRequests[UART6_INDEX].Buffer.Length)
                 {
-                    RXRequests[UART6].State = READY;
-                    /* DISABLE RXE interrupt */
+                    RXRequests[UART6_INDEX].State = READY;
+                    /* DISABLE TXE interrupt */
                     UARTs[UART6]->CR1 &= ~UART_RXNEIE_MASK;
 
-                    if(RXRequests[UART6].Cb)
-                    {
-                        RXRequests[UART6].Cb();
-                    }
+                    RXRequests[UART6_INDEX].Cb();
                 }
 
-            }
+            }    
         }
-    }
+
+    }  
 } 
 
 

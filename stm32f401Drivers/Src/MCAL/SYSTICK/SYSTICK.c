@@ -194,10 +194,10 @@ SYSTICK_ErrorStatus_t SYSTICK_SetCallback(systickcbf_t cbf)
 }
 
 
-void SysTick_Handler(void)
-{
-    if(G_systickcbf)
-    {
-        G_systickcbf();
-    }
-}
+//void SysTick_Handler(void)
+//{
+//    if(G_systickcbf)
+//    {
+//        G_systickcbf();
+//    }
+//}

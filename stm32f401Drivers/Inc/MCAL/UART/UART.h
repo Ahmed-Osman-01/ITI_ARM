@@ -196,7 +196,7 @@ UART_ErrorStatus_t UART_ConfigLIN(u8 UARTx, UART_LIN_Config_t* Config);
  * @param UARTx UART1, UART2 or UART6
  * @return UART_ErrorStatus_t 
  */
-UART_ErrorStatus_t UART_SendBreak(u8 UARTx);
+UART_ErrorStatus_t UART_TXLINBreak(u8 UARTx);
 
 
 /**

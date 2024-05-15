@@ -1,0 +1,13 @@
+/*
+ * FreeRTOSConfig.h
+ *
+ *  Created on: May 2, 2024
+ *      Author: Osman
+ */
+
+#ifndef SERVICE_FREERTOS_FREERTOSCONFIG_H_
+#define SERVICE_FREERTOS_FREERTOSCONFIG_H_
+
+
+
+#endif /* SERVICE_FREERTOS_FREERTOSCONFIG_H_ */

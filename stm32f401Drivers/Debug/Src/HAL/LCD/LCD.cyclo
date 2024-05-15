@@ -1,7 +1,7 @@
-../Src/HAL/LCD/LCD.c:166:13:Latch	3
+../Src/HAL/LCD/LCD.c:166:13:Latch	4
 ../Src/HAL/LCD/LCD.c:207:13:WriteCommand	1
 ../Src/HAL/LCD/LCD.c:215:13:WriteData	1
-../Src/HAL/LCD/LCD.c:227:13:InitProcess	12
+../Src/HAL/LCD/LCD.c:297:13:InitProcess	15
 ../Src/HAL/LCD/LCD.c:392:13:WriteString	3
 ../Src/HAL/LCD/LCD.c:416:13:WriteBuffer	3
 ../Src/HAL/LCD/LCD.c:440:13:ClearScreen	2

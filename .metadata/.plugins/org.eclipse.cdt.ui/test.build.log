@@ -1,0 +1,7 @@
+13:27:42 **** Build of configuration Debug for project test ****
+make all 
+make: *** No rule to make target `test', needed by `main-build'.  Stop.
+"make all" terminated with exit code 2. Build might be incomplete.
+
+13:27:43 Build Failed. 1 errors, 0 warnings. (took 341ms)
+

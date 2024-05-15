@@ -1,0 +1,104 @@
+
+
+
+#if 1
+
+
+#include "LIB/STD_TYPES.h"
+#include "MCAL/RCC/RCC.h"
+#include "MCAL/UART/UART.h"
+#include "MCAL/NVIC/NVIC.h"
+#include "MCAL/GPIO/GPIO.h"
+#include "SERVICE/SCHED/SCHED.h"
+
+#include "HAL/LCD/LCD.h"
+#include "HAL/LED/LED.h"
+
+#include "APP/TrafficLights/blinkingLed.h"
+
+
+u8 buffer[7] = {0};
+
+void fun(void)
+{
+
+}
+
+void rxCB(void)
+{
+	LCD_WriteBufferAsync(buffer, 7);
+}
+
+
+int main(void)
+{
+
+    RCC_EnableClk(RCC_CLK_HSE);
+    RCC_SetSystemClk(RCC_SYSCLK_HSE);
+
+    RCC_EnablePeripheral(RCC_GPIOA);
+    RCC_EnablePeripheral(RCC_GPIOB);
+    RCC_EnablePeripheral(RCC_USART1);
+    RCC_EnablePeripheral(RCC_USART2);
+    RCC_EnablePeripheral(RCC_USART6);
+
+    NVIC_EnableInterrupt(NVIC_USART2);
+    NVIC_EnableInterrupt(NVIC_USART1);
+
+    GPIO_Pin_t uart2TX;
+    GPIO_Pin_t uart2RX;
+
+    uart2TX.Mode = GPIO_MODE_AF_PP;
+    uart2TX.AF = GPIO_AF_USART1_2;
+    uart2TX.Pin = GPIO_PIN_2;
+    uart2TX.Port = GPIO_PORT_A;
+    uart2TX.Speed = GPIO_SPEED_HIGH;
+
+    uart2RX.Mode = GPIO_MODE_AF_PP;
+    uart2RX.AF = GPIO_AF_USART1_2;
+    uart2RX.Pin = GPIO_PIN_3;
+    uart2RX.Port = GPIO_PORT_A;
+    uart2RX.Speed = GPIO_SPEED_HIGH;
+
+    GPIO_Init(&uart2TX);
+    GPIO_Init(&uart2RX);
+
+    UART_Config_t uart1Config;
+    uart1Config.BaudRate = 9600;
+    uart1Config.Mode = UART_MODE_TX_RX;
+    uart1Config.Parity = UART_PARITY_DISABLE;
+    uart1Config.Sampling = UART_SAMPLING_16;
+    uart1Config.WordLength = UART_WORDLENGTH_8;
+
+    UART_SetConfig(UART2, &uart1Config);
+
+    LCD_Init();
+    LED_Init();
+
+    blinkingLed_Init();
+
+    SCHED_Init();
+    SCHED_Start();
+
+    return 0;
+}
+
+
+void lcdApp(void)
+{
+
+	LCD_SendCommandAsync(DISPLAY_ON_CURSOR_ON_BLINKING_ON);
+
+	LCD_WriteStringAsync("Ahmed ;)");
+	LCD_SetCursorPosAsync(1, 5);
+	LCD_WriteStringAsync("Osman");
+
+//	LCD_SendCommandAsync(DISPLAY_ON_CURSOR_OFF_BLINKING_OFF);
+//	LCD_SendCommandAsync(DISPLAY_ON_CURSOR_ON_BLINKING_OFF);
+
+
+}
+
+
+
+#endif

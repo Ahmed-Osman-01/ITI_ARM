@@ -1,0 +1,43 @@
+/*
+ * LED_config.c
+ *
+ *  Created on: Feb 17, 2024
+ *      Author: Osman
+ */
+
+#include "LIB/STD_TYPES.h"
+#include "HAL/LED/LED.h"
+#include "MCAL/GPIO/GPIO.h "
+
+const LED_Config_t Leds[_LED_NUM] = {
+    [BLINKING_LED] = {
+        .Port = GPIO_PORT_A,
+        .Pin = GPIO_PIN_0,
+        .Connection = LED_CONNECTION_REVERSE,
+        .InitState = LED_STATE_OFF,
+    },
+//    [RED_LED] = {
+//        .Port = GPIO_PORT_A,
+//        .Pin = GPIO_PIN_0,
+//        .Connection = LED_CONNECTION_FORWARD,
+//        .InitState = LED_STATE_OFF,
+//    },
+//   [GREEN_LED] = {
+//       .Port = GPIO_PORT_A,
+//       .Pin = GPIO_PIN_1,
+//       .Connection = LED_CONNECTION_FORWARD,
+//       .InitState = LED_STATE_OFF,
+//   },
+//   [YELLOW_LED] = {
+//       .Port = GPIO_PORT_A,
+//       .Pin = GPIO_PIN_2,
+//       .Connection = LED_CONNECTION_FORWARD,
+//       .InitState = LED_STATE_OFF,
+//   },
+//    [LED_FIVE] = {
+//        .Port = GPIO_PORT_A,
+//        .Pin = GPIO_PIN_3,
+//        .Connection = LED_CONNECTION_FORWARD,
+//        .InitState = LED_STATE_OFF,
+//    },
+};

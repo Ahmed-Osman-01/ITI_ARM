@@ -1,0 +1,2 @@
+../Src/APP/TEST/rtos_test.c:23:6:vTaskCode	32	static,ignoring_inline_asm
+../Src/APP/TEST/rtos_test.c:43:5:main	16	static

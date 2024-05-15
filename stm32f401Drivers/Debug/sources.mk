@@ -25,8 +25,7 @@ C_DEPS :=
 SUBDIRS := \
 Src/APP/TEST \
 Src/APP/TrafficLights \
-Src/COMM/LIN_MASTER \
-Src/COMM/LIN_SLAVE \
+Src/COMM/LIN \
 Src/HAL/LCD \
 Src/HAL/LED \
 Src/HAL/SWITCH \
@@ -35,6 +34,7 @@ Src/MCAL/NVIC \
 Src/MCAL/RCC \
 Src/MCAL/SYSTICK \
 Src/MCAL/UART \
+Src/SERVICE/FreeRTOS \
 Src/SERVICE/SCHED \
 Startup \
 

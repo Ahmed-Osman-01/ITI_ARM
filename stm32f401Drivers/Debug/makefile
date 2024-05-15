@@ -11,6 +11,7 @@ RM := rm -rf
 -include sources.mk
 -include Startup/subdir.mk
 -include Src/SERVICE/SCHED/subdir.mk
+-include Src/SERVICE/FreeRTOS/subdir.mk
 -include Src/MCAL/UART/subdir.mk
 -include Src/MCAL/SYSTICK/subdir.mk
 -include Src/MCAL/RCC/subdir.mk
@@ -19,8 +20,7 @@ RM := rm -rf
 -include Src/HAL/SWITCH/subdir.mk
 -include Src/HAL/LED/subdir.mk
 -include Src/HAL/LCD/subdir.mk
--include Src/COMM/LIN_SLAVE/subdir.mk
--include Src/COMM/LIN_MASTER/subdir.mk
+-include Src/COMM/LIN/subdir.mk
 -include Src/APP/TrafficLights/subdir.mk
 -include Src/APP/TEST/subdir.mk
 -include objects.mk

@@ -16,12 +16,12 @@ const LED_Config_t Leds[_LED_NUM] = {
         .Connection = LED_CONNECTION_REVERSE,
         .InitState = LED_STATE_OFF,
     },
-//    [LED_ONE] = {
-//        .Port = GPIO_PORT_B,
-//        .Pin = GPIO_PIN_0,
-//        .Connection = LED_CONNECTION_FORWARD,
-//        .InitState = LED_STATE_OFF,
-//    },
+    [LED_ONE] = {
+        .Port = GPIO_PORT_B,
+        .Pin = GPIO_PIN_0,
+        .Connection = LED_CONNECTION_FORWARD,
+        .InitState = LED_STATE_OFF,
+    },
 //    [LED_THREE] = {
 //        .Port = GPIO_PORT_A,
 //        .Pin = GPIO_PIN_1,

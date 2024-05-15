@@ -1,7 +1,7 @@
-../Src/HAL/LCD/LCD.c:166:13:Latch	24	static
+../Src/HAL/LCD/LCD.c:166:13:Latch	32	static
 ../Src/HAL/LCD/LCD.c:207:13:WriteCommand	16	static
 ../Src/HAL/LCD/LCD.c:215:13:WriteData	16	static
-../Src/HAL/LCD/LCD.c:227:13:InitProcess	8	static
+../Src/HAL/LCD/LCD.c:297:13:InitProcess	8	static
 ../Src/HAL/LCD/LCD.c:392:13:WriteString	8	static
 ../Src/HAL/LCD/LCD.c:416:13:WriteBuffer	8	static
 ../Src/HAL/LCD/LCD.c:440:13:ClearScreen	8	static
